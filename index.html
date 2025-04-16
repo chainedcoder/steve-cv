@@ -208,8 +208,8 @@
           border: 1px solid var(--module-border-color);
           display: flex;
           align-items: center;
-          flex-wrap: wrap;
-          gap: 10px;
+          flex-wrap: wrap; /* Allows wrapping */
+          gap: 10px; /* Gap between input and button group */
           transition: background-color 0.3s, border-color 0.3s;
        }
 
@@ -221,7 +221,7 @@
        #commandInput {
           flex-grow: 1;
           flex-shrink: 1;
-          min-width: 150px;
+          min-width: 150px; /* Ensure input has a minimum width */
           background: transparent;
           border: none;
           color: var(--input-text-color);
@@ -233,6 +233,14 @@
           padding: 5px;
        }
 
+       /* New container for buttons */
+       .button-group {
+           display: flex;
+           flex-wrap: nowrap; /* Prevent buttons from wrapping within the group */
+           gap: 10px; /* Gap between buttons */
+           flex-shrink: 0; /* Prevent the group from shrinking */
+       }
+
        button {
           background-color: #700000;
           color: #fff;
@@ -242,7 +250,7 @@
           font-size: 1em;
           cursor: pointer;
           outline: none;
-          flex-shrink: 0;
+          flex-shrink: 0; /* Prevent individual buttons from shrinking */
           transition: background-color 0.3s, color 0.3s, border-color 0.3s;
        }
 
@@ -598,9 +606,11 @@
           <div class="input-area">
              <span>></span>
              <input type="text" id="commandInput" placeholder="" autofocus>
-             <button onclick="runCommand()">RUN</button>
-             <button id="runAllButton" onclick="runAllCommands()">RUN ALL</button>
-             <button id="cycleThemeButton" onclick="cycleTheme()" title="Cycle Theme">CYCLE THEME</button>
+             <div class="button-group">
+                <button onclick="runCommand()">RUN</button>
+                <button id="runAllButton" onclick="runAllCommands()">RUN ALL</button>
+                <button id="cycleThemeButton" onclick="cycleTheme()" title="Cycle Theme">CYCLE THEME</button>
+             </div>
           </div>
           <div id="commandOutput" class="output-area"></div>
        </div>
@@ -609,7 +619,7 @@
     <div class="sidebar">
        <h2>NAVIGATION</h2>
        <ul>
-          
+
           <li><a href="#">HELP</a></li>
           <li><a href="#">RUN ALL</a></li>
           <li><a href="#">DOWNLOAD CV</a></li>
@@ -627,500 +637,607 @@
     </div>
 
     <script>
-       const body = document.body;
-       const commandInput = document.getElementById('commandInput');
-       const commandOutput = document.getElementById('commandOutput');
-       const copyrightYearSpan = document.getElementById('copyrightYear');
-       const mainContent = document.querySelector('.main-content');
-       const commandInputModule = document.getElementById('command-input-module');
-       let helpModule = document.getElementById('help-module');
-       const createdModules = {};
-
-       const profileData = [
-          ["system", "[SYSTEM] Loading profile..."],
-          ["data", "&gt; Stephen is a Senior Software Engineer:"],
-          ["data", "&gt; Expertise includes..."],
-          ["data", "  - Node.js, react, Nest, python."],
-          ["data", "  - Experienced with microservices architecture."],
-          ["data", "  - Proficient in cloud technologies."],
-          ["system", "[SYSTEM] Profile loaded."]
-       ];
-       const experienceData = [
-          ["system", "[RUNNING] Fetching experience details..."],
-          ["data", "&gt; At MNOCK Ltd (Part-Time), focused on payment workflows, M-Pesa API integration, and AWS deployments with CI/CD."],
-          ["data", "  - Technologies used: Node.js, AWS, M-Pesa API, CI/CD."],
-          ["data", "&gt; At Valice Ltd, worked on microservices, real-time data processing, and database optimization."],
-          ["data", "  - Technologies used: Microservices, Real-time Data, SQL, NoSQL."],
-          ["system", "[SYSTEM] Experience details loaded."]
-       ];
-       const projectsData = [
-          ["system", "[SYSTEM] Querying skills matrix..."],
-          ["data", "&gt; Strong in Fintech Integrations, ensuring secure and resilient transactions."],
-          ["data", "  - Details: Skilled in secure transaction processing and API integrations."],
-          ["data", "&gt; Knowledgeable in Security Protocols, including OWASP and SSL/TLS implementation."],
-          ["data", "  - Details: Experienced in security hardening and encryption protocols."],
-          ["data", "&gt; Proficient in High-Availability deployments using container orchestration on AWS."],
-          ["data", "  - Details: Familiar with Docker, Kubernetes/ECS, and various AWS services."],
-          ["system", "[SYSTEM] Skills matrix retrieved."]
-       ];
-       const contactData = [
-          ["system", "[SYSTEM] Connecting..."],
-          ["data", "Email: stephen.nyamweya.o@gmail.com"],
-          ["data", `<a href="https://github.com/chainedcoder" target="_blank" style="color: var(--accent-color); text-decoration: underline;">Visit GitHub profile</a>`],
-          ["system", "[SYSTEM] Connected."]
-       ];
-       const cvLinkData = [
-          ["system", "[SYSTEM] Accessing CV resource..."],
-          ["data", `<a href="full_cv.pdf" target="_blank" style="color: var(--accent-color); text-decoration: underline;">Click here to access CV</a>`],
-          ["system", "[SYSTEM] Resource link generated."]
-       ];
-
-       const moduleConfigurations = [{
-          id: 'profile',
-          commandAliases: ['profile', 'p'],
-          commandPromptText: 'OUTPUT: PROFILE',
-          loadingMessage: 'LOADING PROFILE...',
-          data: profileData,
-          sidebarLinkText: 'PROFILE',
-          order: 10
-       }, {
-          id: 'experience',
-          commandAliases: ['experience', 'exp'],
-          commandPromptText: 'OUTPUT: EXPERIENCE',
-          loadingMessage: 'LOADING EXPERIENCE...',
-          data: experienceData,
-          sidebarLinkText: 'EXPERIENCE',
-          order: 20
-       }, {
-          id: 'projects',
-          commandAliases: ['projects', 'proj', 'skills', 's'],
-          commandPromptText: 'OUTPUT: SKILLS',
-          loadingMessage: 'ACCESSING SKILLS...',
-          data: projectsData,
-          sidebarLinkText: 'SKILLS',
-          order: 30
-       }, {
-          id: 'contact',
-          commandAliases: ['contact', 'c'],
-          commandPromptText: 'OUTPUT: CONTACT',
-          loadingMessage: 'CONNECTING...',
-          data: contactData,
-          sidebarLinkText: 'CONTACT',
-          order: 40
-       }, {
-          id: 'cv',
-          commandAliases: ['cv', 'get cv'],
-          commandPromptText: 'OUTPUT: CV',
-          loadingMessage: 'ACCESSING CV...',
-          data: cvLinkData,
-          sidebarLinkText: 'DOWNLOAD CV',
-          order: 50
-       }];
-
-       function createOutputModule(id, promptText, order = null) {
-          const moduleElement = document.createElement('div');
-          moduleElement.className = 'module';
-          moduleElement.id = `${id}-output-module`;
-          moduleElement.style.display = 'none';
-          if (order !== null) {
-             moduleElement.dataset.order = order;
-          }
-          const deleteButton = document.createElement('button');
-          deleteButton.className = 'delete-btn';
-          deleteButton.title = 'Hide this module';
-          deleteButton.onclick = () => deleteModule(deleteButton);
-          const deleteImg = document.createElement('img');
-          deleteImg.src = 'trash.svg';
-          deleteImg.alt = 'Delete';
-          deleteButton.appendChild(deleteImg);
-          const promptPara = document.createElement('p');
-          promptPara.className = 'command-prompt';
-          promptPara.textContent = promptText;
-          const outputArea = document.createElement('div');
-          outputArea.className = 'output-area';
-          outputArea.id = `${id}-output`;
-          moduleElement.appendChild(deleteButton);
-          moduleElement.appendChild(promptPara);
-          moduleElement.appendChild(outputArea);
-          createdModules[id] = moduleElement;
-          return {
-             moduleElement,
-             outputArea
-          };
-       }
-
-       function placeModuleInDOM(moduleElement, moduleConfig) {
-          if (!mainContent || !commandInputModule) {
-             console.error("Cannot place module: mainContent or commandInputModule missing.");
-             return;
-          }
-          const newOrder = moduleConfig.order;
-          if (newOrder === null || newOrder === undefined) {
-             mainContent.appendChild(moduleElement);
-             return;
-          }
-          let referenceNode = null;
-          const existingDynamicModules = mainContent.querySelectorAll('.module:not(#help-module):not(#command-input-module)');
-          for (const existingModule of existingDynamicModules) {
-             const existingOrderStr = existingModule.dataset.order;
-             if (existingOrderStr === null || existingOrderStr === undefined) continue;
-             const existingOrder = parseInt(existingOrderStr, 10);
-             if (!isNaN(existingOrder) && existingOrder > newOrder) {
-                referenceNode = existingModule;
-                break;
-             }
-          }
-          if (referenceNode) {
-             mainContent.insertBefore(moduleElement, referenceNode);
-          } else {
-             let lastOrderedSibling = null;
-             for (let i = existingDynamicModules.length - 1; i >= 0; i--) {
-                if (existingDynamicModules[i].dataset.order !== null && existingDynamicModules[i].dataset.order !== undefined) {
-                   lastOrderedSibling = existingDynamicModules[i];
-                   break;
+        const body = document.body;
+        const commandInput = document.getElementById('commandInput');
+        const commandOutput = document.getElementById('commandOutput');
+        const copyrightYearSpan = document.getElementById('copyrightYear');
+        const mainContent = document.querySelector('.main-content');
+        const commandInputModule = document.getElementById('command-input-module');
+        let helpModule = null;
+        const createdModules = {};
+ 
+        const profileData = [
+           ["system", "[SYSTEM] Loading profile..."],
+           ["data", "&gt; Stephen is a Senior Software Engineer:"],
+           ["data", "&gt; Expertise includes..."],
+           ["data", "  - Node.js, react, Nest, python."],
+           ["data", "  - Experienced with microservices architecture."],
+           ["data", "  - Proficient in cloud technologies."],
+           ["system", "[SYSTEM] Profile loaded."]
+        ];
+        const experienceData = [
+           ["system", "[RUNNING] Fetching experience details..."],
+           ["data", "&gt; At MNOCK Ltd (Part-Time), focused on payment workflows, M-Pesa API integration, and AWS deployments with CI/CD."],
+           ["data", "  - Technologies used: Node.js, AWS, M-Pesa API, CI/CD."],
+           ["data", "&gt; At Valice Ltd, worked on microservices, real-time data processing, and database optimization."],
+           ["data", "  - Technologies used: Microservices, Real-time Data, SQL, NoSQL."],
+           ["system", "[SYSTEM] Experience details loaded."]
+        ];
+        const projectsData = [
+           ["system", "[SYSTEM] Querying skills matrix..."],
+           ["data", "&gt; Strong in Fintech Integrations, ensuring secure and resilient transactions."],
+           ["data", "  - Details: Skilled in secure transaction processing and API integrations."],
+           ["data", "&gt; Knowledgeable in Security Protocols, including OWASP and SSL/TLS implementation."],
+           ["data", "  - Details: Experienced in security hardening and encryption protocols."],
+           ["data", "&gt; Proficient in High-Availability deployments using container orchestration on AWS."],
+           ["data", "  - Details: Familiar with Docker, Kubernetes/ECS, and various AWS services."],
+           ["system", "[SYSTEM] Skills matrix retrieved."]
+        ];
+        const contactData = [
+           ["system", "[SYSTEM] Connecting..."],
+           ["data", "Email: stephen.nyamweya.o@gmail.com"],
+           ["data", `<a href="https://github.com/chainedcoder" target="_blank" style="color: var(--accent-color); text-decoration: underline;">Visit GitHub profile</a>`],
+           ["system", "[SYSTEM] Connected."]
+        ];
+        const cvLinkData = [
+           ["system", "[SYSTEM] Accessing CV resource..."],
+           ["data", `<a href="full_cv.pdf" target="_blank" style="color: var(--accent-color); text-decoration: underline;">Click here to access CV</a>`],
+           ["system", "[SYSTEM] Resource link generated."]
+        ];
+ 
+        const moduleConfigurations = [{
+           id: 'profile',
+           commandAliases: ['profile', 'p'],
+           commandPromptText: 'OUTPUT: PROFILE',
+           loadingMessage: 'LOADING PROFILE...',
+           data: profileData,
+           sidebarLinkText: 'PROFILE',
+           order: 10
+        }, {
+           id: 'experience',
+           commandAliases: ['experience', 'exp'],
+           commandPromptText: 'OUTPUT: EXPERIENCE',
+           loadingMessage: 'LOADING EXPERIENCE...',
+           data: experienceData,
+           sidebarLinkText: 'EXPERIENCE',
+           order: 20
+        }, {
+           id: 'projects',
+           commandAliases: ['projects', 'proj', 'skills', 's'],
+           commandPromptText: 'OUTPUT: SKILLS',
+           loadingMessage: 'ACCESSING SKILLS...',
+           data: projectsData,
+           sidebarLinkText: 'SKILLS',
+           order: 30
+        }, {
+           id: 'contact',
+           commandAliases: ['contact', 'c'],
+           commandPromptText: 'OUTPUT: CONTACT',
+           loadingMessage: 'CONNECTING...',
+           data: contactData,
+           sidebarLinkText: 'CONTACT',
+           order: 40
+        }, {
+           id: 'cv',
+           commandAliases: ['cv', 'get cv'],
+           commandPromptText: 'OUTPUT: CV',
+           loadingMessage: 'ACCESSING CV...',
+           data: cvLinkData,
+           sidebarLinkText: 'DOWNLOAD CV',
+           order: 50
+        }];
+ 
+        function createOutputModule(id, promptText, order = null) {
+            const moduleElement = document.createElement('div');
+            moduleElement.className = 'module';
+            moduleElement.id = `${id}-output-module`;
+            moduleElement.style.display = 'none';
+            if (order !== null) {
+               moduleElement.dataset.order = order;
+            }
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'delete-btn';
+            deleteButton.title = 'Hide this module';
+            deleteButton.onclick = () => deleteModule(deleteButton);
+            const deleteImg = document.createElement('img');
+            deleteImg.src = 'trash.svg';
+            deleteImg.alt = 'Delete';
+            deleteButton.appendChild(deleteImg);
+            const promptPara = document.createElement('p');
+            promptPara.className = 'command-prompt';
+            promptPara.textContent = promptText;
+            const outputArea = document.createElement('div');
+            outputArea.className = 'output-area';
+            outputArea.id = `${id}-output`;
+            moduleElement.appendChild(deleteButton);
+            moduleElement.appendChild(promptPara);
+            moduleElement.appendChild(outputArea);
+            createdModules[id] = moduleElement;
+            return {
+               moduleElement,
+               outputArea
+            };
+        }
+ 
+        function placeModuleInDOM(moduleElement, moduleConfig) {
+            if (!mainContent || !commandInputModule) {
+               console.error("Cannot place module: mainContent or commandInputModule missing.");
+               return;
+            }
+ 
+            const newOrder = moduleConfig.order;
+ 
+            if (newOrder === null || newOrder === undefined) {
+                mainContent.appendChild(moduleElement);
+                return;
+            }
+ 
+            let referenceNode = null;
+            let checkNode = commandInputModule.nextSibling;
+ 
+            while(checkNode) {
+                if (checkNode.nodeType === Node.ELEMENT_NODE && checkNode.classList.contains('module') && checkNode.id !== 'help-module') {
+                    const existingOrderStr = checkNode.dataset.order;
+                    if (existingOrderStr !== null && existingOrderStr !== undefined) {
+                        const existingOrder = parseInt(existingOrderStr, 10);
+                        if (!isNaN(existingOrder) && existingOrder > newOrder) {
+                            referenceNode = checkNode;
+                            break;
+                        }
+                    }
                 }
-             }
-             if (lastOrderedSibling) {
-                mainContent.insertBefore(moduleElement, lastOrderedSibling.nextSibling);
-             } else {
-                mainContent.insertBefore(moduleElement, commandInputModule.nextSibling);
-             }
-          }
-       }
-
-       function renderOutputData(data, outputElement) {
-          if (!outputElement) return;
-          outputElement.innerHTML = '';
-          data.forEach(item => {
-             const type = item[0],
-                text = item[1],
-                lineElement = document.createElement('p');
-             lineElement.classList.add('output-line', type);
-             lineElement.innerHTML = text;
-             outputElement.appendChild(lineElement);
-          });
-          outputElement.scrollTop = 0;
-       }
-
-       function clearAllHighlights() {
-          Object.values(createdModules).forEach(mod => {
-             if (mod && mod.parentNode) mod.classList.remove('is-flashing', 'is-highlighted');
-          });
-          if (helpModule) helpModule.classList.remove('is-flashing', 'is-highlighted');
-       }
-
-       function highlightModule(moduleElement) {
-          if (!moduleElement || !moduleElement.parentNode) return;
-          const isHighlightable = Object.values(createdModules).includes(moduleElement) || moduleElement === helpModule;
-          if (!isHighlightable) return;
-          clearAllHighlights();
-          moduleElement.classList.add('is-flashing');
-          setTimeout(() => {
-             if (moduleElement && moduleElement.classList.contains('is-flashing') && moduleElement.parentNode) {
-                moduleElement.classList.remove('is-flashing');
-                moduleElement.classList.add('is-highlighted');
-             }
-          }, 400);
-       }
-
-       function simulateLoading(outputElement, message, data, moduleElement, scrollToModule = false) {
-          if (!moduleElement || !outputElement) {
-             console.error("Missing module or output element for:", message);
-             return;
-          }
-          if (!moduleElement.parentNode) {
-             console.warn("Module not in DOM, skipping simulateLoading for:", message);
-             return;
-          }
-          moduleElement.style.display = 'block';
-          outputElement.innerHTML = `<p class="output-line system">[...] ${message}</p>`;
-          setTimeout(() => {
-             if (outputElement && moduleElement.parentNode) {
-                renderOutputData(data, outputElement);
-                highlightModule(moduleElement);
-                if (scrollToModule) {
-                   moduleElement.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'nearest'
-                   });
-                }
-             }
-          }, 200);
-       }
-
-       const themes = ['reddy', 'bluey', 'greenie', 'whity', 'whity-white', 'whity-teal', 'darkie'];
-       let currentThemeIndex = 0;
-
-       function setTheme(themeName) {
-          if (!themes.includes(themeName)) {
-             console.warn(`Invalid theme: ${themeName}`);
-             themeName = themes[0];
-          }
-          body.className = '';
-          body.classList.add(`theme-${themeName}`);
-          currentThemeIndex = themes.indexOf(themeName);
-          console.log(`Theme set: theme-${themeName}`);
-       }
-
-       function cycleTheme() {
-          currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-          const nextThemeName = themes[currentThemeIndex];
-          setTheme(nextThemeName);
-          const friendlyThemeName = nextThemeName.replace('whity-white', 'Whity White').replace('whity-teal', 'Whity Teal').replace('whity', 'Whity (Default)').replace('-', ' ');
-          const capitalizedThemeName = friendlyThemeName.charAt(0).toUpperCase() + friendlyThemeName.slice(1);
-          commandOutput.innerHTML = `<p class="output-line system">> Theme cycled to ${capitalizedThemeName}.</p>`;
-          setTimeout(() => {
-             const msg = `> Theme cycled to ${capitalizedThemeName}.`;
-             if (commandOutput.textContent.includes(msg)) {
-                commandOutput.innerHTML = '';
-             }
-          }, 2000);
-       }
-
-       function runCommand(commandOverride = null, triggeredBySidebar = false) {
-          const command = (commandOverride || commandInput.value).trim().toLowerCase();
-          commandOutput.innerHTML = '';
-          const runningMsg = document.createElement('p');
-          runningMsg.classList.add('output-line', 'system');
-          const escapedCommand = command.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-          const moduleConfig = moduleConfigurations.find(config => config.commandAliases.includes(command));
-          const themeCommands = themes.map(t => `theme ${t}`);
-          const nonDataDisplayCommands = ['help', 'theme', 'run all', 'cycle theme'].concat(themeCommands);
-          const isDataCommand = !!moduleConfig;
-          if (!commandOverride || (commandOverride && isDataCommand && !triggeredBySidebar)) {
-             runningMsg.textContent = `> Running command: ${escapedCommand}`;
-             commandOutput.appendChild(runningMsg);
-          }
-          if (!commandOverride) {
-             commandInput.value = '';
-          }
-          const clearCmdOutput = (delay = 4000) => setTimeout(() => {
-             if (commandOutput.contains(runningMsg)) {
-                commandOutput.removeChild(runningMsg);
-             }
-          }, delay);
-
-          if (moduleConfig) {
-             let moduleElement = document.getElementById(`${moduleConfig.id}-output-module`);
-             let outputArea = null;
-             if (!moduleElement) {
-                const created = createOutputModule(moduleConfig.id, moduleConfig.commandPromptText, moduleConfig.order);
-                if (created) {
-                   moduleElement = created.moduleElement;
-                   outputArea = created.outputArea;
-                   placeModuleInDOM(moduleElement, moduleConfig);
-                } else {
-                   commandOutput.innerHTML = `<p class="output-line error">> ERROR: Failed to create module '${moduleConfig.id}'.</p>`;
-                   return;
-                }
-             } else {
-                outputArea = document.getElementById(`${moduleConfig.id}-output`);
-             }
-             if (moduleElement && outputArea) {
-                if (moduleElement.style.display === 'none') {
-                   moduleElement.style.display = 'block';
-                }
-                simulateLoading(outputArea, moduleConfig.loadingMessage, moduleConfig.data, moduleElement, triggeredBySidebar);
-             } else {
-                console.error(`Output area not found for ${moduleConfig.id}`);
-                commandOutput.innerHTML = `<p class="output-line error">> ERROR: Could not find output area for command '${escapedCommand}'.</p>`;
-             }
-             clearCmdOutput();
-          } else {
-             switch (command) {
-                case 'help':
-                   let helpHTML = `<p class="output-line data">Available commands:</p>`;
-                   moduleConfigurations.forEach(cfg => {
-                      const aliases = cfg.commandAliases.slice(1).join(', ');
-                      helpHTML += `<p class="output-line data">- ${cfg.commandAliases[0]}${aliases ? ` (${aliases})` : ''}</p>`;
-                   });
-                   helpHTML += `<p class="output-line data">- theme [${themes.join('|')}]</p><p class="output-line data">- run all</p><p class="output-line data">- cycle theme</p>`;
-                   commandOutput.innerHTML = helpHTML;
-                   highlightModule(helpModule);
-                   break;
-                case 'run all':
-                   clearAllHighlights();
-                   commandOutput.innerHTML = '<p class="output-line system">> Initiating all commands...</p>';
-                   runAllCommands();
-                   break;
-                case 'theme':
-                   commandOutput.innerHTML = `<p class="output-line data">> Available themes: ${themes.join(', ')}. Use command: theme [theme_name]</p>`;
-                   setTimeout(() => {
-                      commandOutput.innerHTML = '';
-                   }, 5000);
-                   break;
-                case 'cycle theme':
-                   cycleTheme();
-                   break;
-                default:
-                   if (command.startsWith('theme ')) {
-                      const themeName = command.substring(6);
-                      if (themes.includes(themeName)) {
-                         setTheme(themeName);
-                         const friendlyThemeName = themeName.replace('whity-white', 'Whity White').replace('whity-teal', 'Whity Teal').replace('whity', 'Whity (Default)').replace('-', ' ');
-                         const capitalizedThemeName = friendlyThemeName.charAt(0).toUpperCase() + friendlyThemeName.slice(1);
-                         commandOutput.innerHTML = `<p class="output-line system">> Theme set to ${capitalizedThemeName}.</p>`;
-                         setTimeout(() => {
-                            commandOutput.innerHTML = '';
-                         }, 3000);
-                      } else {
-                         commandOutput.innerHTML = `<p class="output-line error">> ERROR: Theme '${themeName}' not recognized. Available: ${themes.join(', ')}</p>`;
-                         setTimeout(() => {
-                            commandOutput.innerHTML = '';
-                         }, 3000);
-                      }
-                   } else {
-                      commandOutput.innerHTML = `<p class="output-line error">> ERROR: Command '${escapedCommand}' not recognized. Type 'help' for available commands.</p>`;
+                checkNode = checkNode.nextSibling;
+            }
+ 
+            if (referenceNode) {
+                mainContent.insertBefore(moduleElement, referenceNode);
+            } else {
+                mainContent.appendChild(moduleElement);
+            }
+        }
+ 
+ 
+        function renderOutputData(data, outputElement) {
+            if (!outputElement) return;
+            outputElement.innerHTML = '';
+            data.forEach(item => {
+               const type = item[0],
+                  text = item[1],
+                  lineElement = document.createElement('p');
+               lineElement.classList.add('output-line', type);
+               lineElement.innerHTML = text;
+               outputElement.appendChild(lineElement);
+            });
+            outputElement.scrollTop = 0;
+        }
+ 
+        function clearAllHighlights() {
+           Object.values(createdModules).forEach(mod => {
+              if (mod && mod.parentNode) mod.classList.remove('is-flashing', 'is-highlighted');
+           });
+           if (helpModule) helpModule.classList.remove('is-flashing', 'is-highlighted');
+        }
+ 
+ 
+        function highlightModule(moduleElement) {
+           if (!moduleElement || !moduleElement.parentNode) return;
+           const isHighlightable = Object.values(createdModules).includes(moduleElement) || moduleElement === helpModule;
+           if (!isHighlightable) return;
+ 
+           clearAllHighlights();
+           moduleElement.classList.add('is-flashing');
+           setTimeout(() => {
+              if (moduleElement && moduleElement.classList.contains('is-flashing') && moduleElement.parentNode) {
+                 moduleElement.classList.remove('is-flashing');
+                 moduleElement.classList.add('is-highlighted');
+              }
+           }, 400);
+        }
+ 
+        function simulateLoading(outputElement, message, data, moduleElement) {
+           if (!moduleElement || !outputElement) {
+              console.error("Missing module or output element for:", message);
+              return;
+           }
+           if (!moduleElement.parentNode) {
+              renderOutputData(data, outputElement);
+              console.warn("Module not in DOM yet for simulateLoading:", message);
+              return;
+           }
+ 
+           moduleElement.style.display = 'block';
+           outputElement.innerHTML = `<p class="output-line system">[...] ${message}</p>`;
+ 
+           setTimeout(() => {
+              if (outputElement && moduleElement.parentNode) {
+                 renderOutputData(data, outputElement);
+                 highlightModule(moduleElement);
+                 moduleElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }
+           }, 200);
+        }
+ 
+ 
+        const themes = ['reddy', 'bluey', 'greenie', 'whity', 'whity-white', 'whity-teal', 'darkie'];
+        let currentThemeIndex = 0;
+ 
+        function setTheme(themeName) {
+           if (!themes.includes(themeName)) {
+              console.warn(`Invalid theme: ${themeName}, defaulting to ${themes[0]}`);
+              themeName = themes[0];
+           }
+           body.className = '';
+           body.classList.add(`theme-${themeName}`);
+           currentThemeIndex = themes.indexOf(themeName);
+           localStorage.setItem('currentTheme', themeName);
+           console.log(`Theme set: theme-${themeName}`);
+ 
+           const deleteBtns = document.querySelectorAll('.delete-btn img');
+           let filterStyle = 'invert(100%)';
+           if (themeName === 'bluey') filterStyle = 'invert(80%) sepia(100%) saturate(1000%) hue-rotate(180deg) brightness(1.5)';
+           else if (themeName === 'greenie') filterStyle = 'invert(85%) sepia(50%) saturate(1000%) hue-rotate(80deg) brightness(1.2)';
+           else if (themeName.startsWith('whity')) filterStyle = 'invert(20%)';
+           else if (themeName === 'darkie') filterStyle = 'invert(75%)';
+           deleteBtns.forEach(img => img.style.filter = filterStyle);
+        }
+ 
+        function cycleTheme() {
+           currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+           const nextThemeName = themes[currentThemeIndex];
+           setTheme(nextThemeName);
+ 
+           const friendlyThemeName = nextThemeName.replace('whity-white', 'Whity White').replace('whity-teal', 'Whity Teal').replace('whity', 'Whity (Default)').replace('-', ' ');
+           const capitalizedThemeName = friendlyThemeName.charAt(0).toUpperCase() + friendlyThemeName.slice(1);
+           commandOutput.innerHTML = `<p class="output-line system">> Theme cycled to ${capitalizedThemeName}.</p>`;
+           setTimeout(() => {
+              const msg = `> Theme cycled to ${capitalizedThemeName}.`;
+              if (commandOutput.textContent.includes(msg)) {
+                 commandOutput.innerHTML = '';
+              }
+           }, 2000);
+        }
+ 
+        function runCommand(commandOverride = null, triggeredBySidebar = false) {
+           const command = (commandOverride || commandInput.value).trim().toLowerCase();
+           commandOutput.innerHTML = '';
+ 
+           const runningMsg = document.createElement('p');
+           runningMsg.classList.add('output-line', 'system');
+           const escapedCommand = command.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+ 
+           const moduleConfig = moduleConfigurations.find(config => config.commandAliases.includes(command));
+ 
+           if (!commandOverride || ['run all', 'clear'].includes(command)) {
+               runningMsg.textContent = `> Running command: ${escapedCommand}`;
+               commandOutput.appendChild(runningMsg);
+           }
+ 
+           if (!commandOverride) {
+              commandInput.value = '';
+           }
+ 
+           const clearCmdOutput = (delay = 4000) => setTimeout(() => {
+               if (runningMsg.parentNode === commandOutput && commandOutput.textContent.includes(runningMsg.textContent)) {
+                   commandOutput.removeChild(runningMsg);
+               }
+           }, delay);
+ 
+ 
+           if (moduleConfig) {
+              let moduleElement = document.getElementById(`${moduleConfig.id}-output-module`);
+              let outputArea = null;
+ 
+              if (!moduleElement) {
+                 const created = createOutputModule(moduleConfig.id, moduleConfig.commandPromptText, moduleConfig.order);
+                 if (created) {
+                    moduleElement = created.moduleElement;
+                    outputArea = created.outputArea;
+                    placeModuleInDOM(moduleElement, moduleConfig);
+                 } else {
+                    commandOutput.innerHTML = `<p class="output-line error">> ERROR: Failed to create module '${moduleConfig.id}'.</p>`;
+                    if (runningMsg.parentNode === commandOutput) commandOutput.removeChild(runningMsg);
+                    return;
+                 }
+              } else {
+                 outputArea = document.getElementById(`${moduleConfig.id}-output`);
+              }
+ 
+              if (moduleElement && outputArea) {
+                 simulateLoading(outputArea, moduleConfig.loadingMessage, moduleConfig.data, moduleElement);
+              } else {
+                 console.error(`Elements not found for ${moduleConfig.id}`);
+                 commandOutput.innerHTML = `<p class="output-line error">> ERROR: Could not process command '${escapedCommand}'. Module elements missing.</p>`;
+              }
+              clearCmdOutput(1000);
+ 
+           } else {
+              switch (command) {
+                 case 'help':
+                    const helpOutputArea = helpModule ? helpModule.querySelector('.output-area') : null;
+                    if (helpModule && helpOutputArea) {
+                        let helpHTML = `<p class="output-line data">Available commands:</p>`;
+                        const sortedConfigs = [...moduleConfigurations].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+                        sortedConfigs.forEach(cfg => {
+                            const aliases = cfg.commandAliases.slice(1).join(', ');
+                            helpHTML += `<p class="output-line data">- ${cfg.commandAliases[0]}${aliases ? ` (${aliases})` : ''}: ${cfg.sidebarLinkText || cfg.commandPromptText}</p>`;
+                        });
+                        helpHTML += `<p class="output-line data">- theme [${themes.join('|')}]: Set display theme</p>`;
+                        helpHTML += `<p class="output-line data">- run all: Display all data modules</p>`;
+                        helpHTML += `<p class="output-line data">- cycle theme: Switch to the next theme</p>`;
+                        helpHTML += `<p class="output-line data">- help: Show this help message</p>`;
+                        helpHTML += `<p class="output-line data">- clear: Hide all output modules</p>`;
+ 
+                        helpOutputArea.innerHTML = helpHTML;
+                        helpModule.style.display = 'block';
+                        highlightModule(helpModule);
+                        helpModule.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        clearCmdOutput(500);
+                    } else {
+                        console.error("Help module or its output area not found!");
+                        commandOutput.innerHTML = `<p class="output-line error">> ERROR: Help module not found. Cannot display help.</p>`;
+                        clearCmdOutput();
+                    }
+                    break;
+ 
+                 case 'run all':
+                    clearAllHighlights();
+                    runAllCommands();
+                    break;
+ 
+                 case 'clear':
+                     Object.keys(createdModules).forEach(id => {
+                         const moduleElement = createdModules[id];
+                         if (moduleElement && moduleElement.parentNode && moduleElement.style.display !== 'none') {
+                            moduleElement.style.display = 'none';
+                         }
+                     });
+                      clearAllHighlights();
                       setTimeout(() => {
-                         commandOutput.innerHTML = '';
-                      }, 3000);
-                   }
-             }
-          }
-       }
-
-       function runAllCommands() {
-          let delay = 0;
-          const interval = 600;
-          const sortedConfigs = [...moduleConfigurations].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
-          sortedConfigs.forEach(config => {
-             const primaryCommand = config.commandAliases[0];
-             setTimeout(() => {
-                runCommand(primaryCommand, false);
-             }, delay);
-             delay += interval;
-          });
-          setTimeout(() => {
-             if (commandOutput.textContent.includes("Initiating all commands...")) {
-                commandOutput.innerHTML = '<p class="output-line system">> All commands initiated.</p>';
-                setTimeout(() => {
-                   if (commandOutput.textContent.includes("All commands initiated.")) {
-                      commandOutput.innerHTML = '';
-                   }
-                }, 2000);
-             }
-          }, delay + 100);
-       }
-
-       function deleteModule(buttonElement) {
-          const moduleToDelete = buttonElement.closest('.module');
-          if (moduleToDelete) {
-             const moduleIdBase = moduleToDelete.id.replace('-output-module', '');
-             if (moduleToDelete.parentNode) {
-                moduleToDelete.parentNode.removeChild(moduleToDelete);
-             }
-             delete createdModules[moduleIdBase];
-          }
-       }
-
-       function wrapWordsInGlitchSpans(selector) {
-          const element = document.querySelector(selector);
-          if (!element) {
-             console.warn("Glitch target not found:", selector);
-             return;
-          }
-          const originalText = element.textContent.trim();
-          const words = originalText.split(/(\s+)/);
-          const newHTML = words.map(part => {
-             if (part.match(/^\s+$/)) return part;
-             if (part.length > 0) {
-                const escapedPart = part.replace(/"/g, '&quot;');
-                return `<h1 class="glitch" data-text="${escapedPart}">${part}</h1>`;
-             }
-             return '';
-          }).join('');
-          element.innerHTML = newHTML;
-       }
-
-       function setupSidebarLinks() {
-          const sidebarList = document.querySelector('.sidebar ul');
-          if (!sidebarList) return;
-          sidebarList.querySelectorAll('.dynamic-module-link').forEach(link => link.parentNode.removeChild(link));
-          const helpLinkItem = Array.from(sidebarList.querySelectorAll('li a')).find(a => a.textContent === 'HELP')?.parentNode;
-          const sortedConfigs = [...moduleConfigurations].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
-          sortedConfigs.forEach(config => {
-             if (config.sidebarLinkText && config.sidebarLinkText !== 'DOWNLOAD CV') {
-                const listItem = document.createElement('li');
-                listItem.classList.add('dynamic-module-link');
-                const link = document.createElement('a');
-                link.href = `#${config.id}-output-module`;
-                link.textContent = config.sidebarLinkText;
-                link.onclick = (event) => {
-                   event.preventDefault();
-                   runCommand(config.commandAliases[0], true);
-                };
-                listItem.appendChild(link);
-                if (helpLinkItem) {
-                   sidebarList.insertBefore(listItem, helpLinkItem);
-                } else {
-                   sidebarList.appendChild(listItem);
-                }
-             }
-          });
-          const cvLink = Array.from(sidebarList.querySelectorAll('li a')).find(a => a.textContent === 'DOWNLOAD CV');
-          if (cvLink) {
-             cvLink.onclick = (event) => {
-                event.preventDefault();
-                runCommand('cv', true);
-             };
-          }
-          const helpLink = Array.from(sidebarList.querySelectorAll('li a')).find(a => a.textContent === 'HELP');
-          if (helpLink) {
-             helpLink.onclick = (event) => {
-                event.preventDefault();
-                runCommand('help');
-             };
-          }
-          const runAllLink = Array.from(sidebarList.querySelectorAll('li a')).find(a => a.textContent === 'RUN ALL');
-          if (runAllLink) {
-             runAllLink.onclick = (event) => {
-                event.preventDefault();
-                runCommand('run all');
-             };
-          }
-       }
-
-       window.addEventListener('load', () => {
-          console.log("Window loaded. Initial setup.");
-          wrapWordsInGlitchSpans('#main-heading');
-
-          if (commandInput) {
-             commandInput.focus();
-             // Attach listener here
-             commandInput.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
-                   event.preventDefault();
-                   runCommand();
-                }
-             });
-          } else {
-             console.error("Command input element not found!");
-          }
-
-          if (copyrightYearSpan) {
-             copyrightYearSpan.textContent = new Date().getFullYear();
-          } else {
-             console.warn("Copyright year span not found.")
-          }
-
-          setTheme('reddy');
-          setupSidebarLinks();
-
-          if (helpModule) {
-             const helpOutputArea = helpModule.querySelector('.output-area');
-             if (helpOutputArea) {
-                let helpHTML = `<p class="output-line data">Available commands:</p>`;
-                moduleConfigurations.forEach(cfg => {
-                   const aliases = cfg.commandAliases.slice(1).join(', ');
-                   helpHTML += `<p class="output-line data">- ${cfg.commandAliases[0]}${aliases ? ` (${aliases})` : ''}</p>`;
-                });
-                helpHTML += `<p class="output-line data">- theme [${themes.join('|')}]</p><p class="output-line data">- run all</p><p class="output-line data">- cycle theme</p>`;
-                helpOutputArea.innerHTML = helpHTML;
-             }
-             commandOutput.innerHTML = `<p class="output-line data">Type 'help' for available commands.</p>`;
-          }
-       });
-    </script>
+                         if (commandOutput.textContent.includes("> Running command: clear")) {
+                              commandOutput.innerHTML = '<p class="output-line system">> Modules hidden.</p>';
+                         }
+                          setTimeout(() => {
+                             if (commandOutput.textContent.includes("> Modules hidden.")) {
+                                 commandOutput.innerHTML = '';
+                             }
+                          }, 1500);
+                      }, 500);
+                     break;
+ 
+                 case 'theme':
+                    commandOutput.innerHTML = `<p class="output-line data">> Available themes: ${themes.join(', ')}. Use command: theme [theme_name]</p>`;
+                    clearCmdOutput(5000);
+                    break;
+ 
+                 case 'cycle theme':
+                    cycleTheme();
+                    clearCmdOutput(500);
+                    break;
+ 
+                 default:
+                    if (command.startsWith('theme ')) {
+                       const themeName = command.substring(6);
+                       if (themes.includes(themeName)) {
+                          setTheme(themeName);
+                          const friendlyThemeName = themeName.replace('whity-white', 'Whity White').replace('whity-teal', 'Whity Teal').replace('whity', 'Whity (Default)').replace('-', ' ');
+                          const capitalizedThemeName = friendlyThemeName.charAt(0).toUpperCase() + friendlyThemeName.slice(1);
+                          commandOutput.innerHTML = `<p class="output-line system">> Theme set to ${capitalizedThemeName}.</p>`;
+                          clearCmdOutput(3000);
+                       } else {
+                          commandOutput.innerHTML = `<p class="output-line error">> ERROR: Theme '${escapedCommand.substring(6)}' not recognized. Available: ${themes.join(', ')}</p>`;
+                          clearCmdOutput(4000);
+                       }
+                    } else {
+                       commandOutput.innerHTML = `<p class="output-line error">> ERROR: Command '${escapedCommand}' not recognized. Type 'help' for available commands.</p>`;
+                       clearCmdOutput(4000);
+                    }
+              }
+           }
+           commandInput.focus();
+        }
+ 
+        function runAllCommands() {
+           let delay = 0;
+           const interval = 300;
+           const sortedConfigs = [...moduleConfigurations].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+ 
+           sortedConfigs.forEach(config => {
+               let moduleElement = document.getElementById(`${config.id}-output-module`);
+               if (!moduleElement) {
+                   const created = createOutputModule(config.id, config.commandPromptText, config.order);
+                    if (created) {
+                       placeModuleInDOM(created.moduleElement, config);
+                       created.moduleElement.style.display = 'none';
+                    }
+               } else {
+                  moduleElement.style.display = 'none';
+               }
+           });
+ 
+           sortedConfigs.forEach(config => {
+              const primaryCommand = config.commandAliases[0];
+              setTimeout(() => {
+                 runCommand(primaryCommand, false);
+              }, delay);
+              delay += interval;
+           });
+ 
+           setTimeout(() => {
+              const runningMsgElement = Array.from(commandOutput.querySelectorAll('.output-line.system')).find(el => el.textContent.includes('> Running command: run all'));
+              if (runningMsgElement) {
+                  runningMsgElement.textContent = '> All modules initiated.';
+              } else if (!commandOutput.textContent.includes('All modules initiated.')) {
+                  commandOutput.innerHTML = '<p class="output-line system">> All modules initiated.</p>';
+              }
+              setTimeout(() => {
+                 if (commandOutput.textContent.includes("All modules initiated.")) {
+                    commandOutput.innerHTML = '';
+                 }
+              }, 2000);
+           }, delay + 100);
+        }
+ 
+ 
+        function deleteModule(buttonElement) {
+           const moduleToDelete = buttonElement.closest('.module');
+           if (moduleToDelete) {
+              const moduleIdBase = moduleToDelete.id.replace('-output-module', '');
+              moduleToDelete.style.display = 'none';
+              moduleToDelete.classList.remove('is-highlighted', 'is-flashing');
+              console.log(`Module ${moduleIdBase} hidden.`);
+           }
+        }
+ 
+ 
+        function wrapWordsInGlitchSpans(selector) {
+            const element = document.querySelector(selector);
+            if (!element) {
+               console.warn("Glitch target not found:", selector);
+               return;
+            }
+            const originalText = element.textContent.trim();
+            const words = originalText.split(/(\s+)/);
+            const newHTML = words.map(part => {
+               if (part.match(/^\s+$/)) return part;
+               if (part.length > 0) {
+                  const escapedPart = part.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                  return `<h1 class="glitch" data-text="${escapedPart}">${escapedPart}</h1>`;
+               }
+               return '';
+            }).join('');
+            element.innerHTML = newHTML;
+        }
+ 
+        function setupSidebarLinks() {
+           const sidebarList = document.querySelector('.sidebar ul');
+           if (!sidebarList) return;
+ 
+           sidebarList.querySelectorAll('.dynamic-module-link').forEach(link => link.parentNode.removeChild(link));
+ 
+           const helpLinkItem = Array.from(sidebarList.querySelectorAll('li a')).find(a => a.textContent.toUpperCase() === 'HELP')?.parentNode;
+           const runAllLinkItem = Array.from(sidebarList.querySelectorAll('li a')).find(a => a.textContent.toUpperCase() === 'RUN ALL')?.parentNode;
+           const cvLinkItem = Array.from(sidebarList.querySelectorAll('li a')).find(a => a.textContent.toUpperCase() === 'DOWNLOAD CV')?.parentNode;
+           const themeHeaderItem = Array.from(sidebarList.querySelectorAll('li')).find(li => li.textContent.toUpperCase() === 'THEME');
+ 
+ 
+           const sortedConfigs = [...moduleConfigurations].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+ 
+           let insertBeforeElement = runAllLinkItem || cvLinkItem || themeHeaderItem || null;
+ 
+           sortedConfigs.forEach(config => {
+              if (config.sidebarLinkText && !['HELP', 'RUN ALL', 'DOWNLOAD CV'].includes(config.sidebarLinkText.toUpperCase())) {
+                 const listItem = document.createElement('li');
+                 listItem.classList.add('dynamic-module-link');
+                 const link = document.createElement('a');
+                 link.href = `#${config.id}-output-module`;
+                 link.textContent = config.sidebarLinkText;
+                 link.onclick = (event) => {
+                    event.preventDefault();
+                    runCommand(config.commandAliases[0], true);
+                 };
+                 listItem.appendChild(link);
+ 
+                 if (insertBeforeElement) {
+                     sidebarList.insertBefore(listItem, insertBeforeElement);
+                 } else {
+                     sidebarList.appendChild(listItem);
+                 }
+              }
+           });
+ 
+           const helpLink = helpLinkItem?.querySelector('a');
+           if (helpLink) {
+              helpLink.href = '#help-module';
+              helpLink.onclick = (event) => {
+                 event.preventDefault();
+                 runCommand('help');
+              };
+           }
+ 
+           const runAllLink = runAllLinkItem?.querySelector('a');
+           if (runAllLink) {
+              runAllLink.href = '#';
+              runAllLink.onclick = (event) => {
+                 event.preventDefault();
+                 runCommand('run all');
+              };
+           }
+ 
+           const cvLink = cvLinkItem?.querySelector('a');
+           const cvConfig = moduleConfigurations.find(c => c.id === 'cv');
+           if (cvLink && cvConfig) {
+              cvLink.href = '#cv-output-module';
+              cvLink.onclick = (event) => {
+                 event.preventDefault();
+                 runCommand(cvConfig.commandAliases[0], true);
+              };
+           }
+        }
+ 
+        window.addEventListener('load', () => {
+           console.log("Window loaded. Initial setup.");
+ 
+           helpModule = document.getElementById('help-module');
+           if (!helpModule) {
+               console.error("FATAL: Help module element not found on load!");
+           }
+ 
+           wrapWordsInGlitchSpans('#main-heading');
+ 
+           if (commandInput) {
+              commandInput.focus();
+              commandInput.addEventListener('keydown', function(event) {
+                 if (event.key === 'Enter') {
+                    event.preventDefault();
+                    runCommand();
+                 }
+              });
+           } else {
+              console.error("Command input element not found!");
+           }
+ 
+           if (copyrightYearSpan) {
+              copyrightYearSpan.textContent = new Date().getFullYear();
+           } else {
+              console.warn("Copyright year span not found.")
+           }
+ 
+           const savedTheme = localStorage.getItem('currentTheme');
+           setTheme(savedTheme || 'reddy');
+ 
+           setupSidebarLinks();
+ 
+           if (helpModule) {
+              const helpOutputArea = helpModule.querySelector('.output-area');
+              if (helpOutputArea) {
+                  let helpHTML = `<p class="output-line data">Available commands:</p>`;
+                  const sortedConfigs = [...moduleConfigurations].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+                  sortedConfigs.forEach(cfg => {
+                      const aliases = cfg.commandAliases.slice(1).join(', ');
+                      helpHTML += `<p class="output-line data">- ${cfg.commandAliases[0]}${aliases ? ` (${aliases})` : ''}: ${cfg.sidebarLinkText || cfg.commandPromptText}</p>`;
+                  });
+                  helpHTML += `<p class="output-line data">- theme [${themes.join('|')}]: Set display theme</p>`;
+                  helpHTML += `<p class="output-line data">- run all: Display all data modules</p>`;
+                  helpHTML += `<p class="output-line data">- cycle theme: Switch to the next theme</p>`;
+                  helpHTML += `<p class="output-line data">- help: Show this help message</p>`;
+                  helpHTML += `<p class="output-line data">- clear: Hide all output modules</p>`;
+                  helpOutputArea.innerHTML = helpHTML;
+                  helpModule.style.display = 'block';
+              } else {
+                  console.error("Help module output area not found on load.");
+              }
+              commandOutput.innerHTML = `<p class="output-line data">System ready. Type 'help' for available commands.</p>`;
+              setTimeout(() => {
+                  if(commandOutput.textContent.includes("System ready.")) {
+                     commandOutput.innerHTML = '';
+                  }
+              } , 4000);
+           } else {
+               commandOutput.innerHTML = `<p class="output-line error">ERROR: Critical element 'help-module' missing. Cannot display initial help.</p>`;
+           }
+ 
+        });
+     </script>
  </body>
 
  </html>
