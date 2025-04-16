@@ -135,7 +135,11 @@
             transition: text-shadow 0.3s;
         }
 
-        @media (max-width: 480px) { h1 { font-size: 1.5rem; } }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
 
 
         .module {
@@ -155,8 +159,9 @@
             word-break: break-word;
             transition: color 0.3s;
         }
+
         .module:has(.delete-btn) .command-prompt {
-             padding-right: 30px; /* Space for delete icon */
+            padding-right: 30px; /* Space for delete icon */
         }
 
         .output-area {
@@ -178,7 +183,8 @@
             word-break: break-word;
             margin: 0 0 0.5em 0;
         }
-         .output-line:last-child {
+
+        .output-line:last-child {
             margin-bottom: 0;
         }
 
@@ -186,7 +192,7 @@
             color: var(--system-text-color);
         }
 
-        .output-line.data { }
+        .output-line.data {}
 
         .error {
             color: #ff6600;
@@ -254,11 +260,13 @@
             opacity: 0.6;
             transition: opacity 0.2s;
         }
+
         .delete-btn:hover {
             background-color: var(--module-border-color);
             border-radius: 3px;
             /* opacity: 1; */
         }
+
         .delete-btn img {
             display: block; /* Remove extra space below img */
             width: 16px; /* Adjust size as needed */
@@ -269,21 +277,29 @@
 
         /* Highlight / Flash Animation */
         @keyframes flash-opacity {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.6; } /* Briefly dim the module */
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+
+            /* Briefly dim the module */
         }
 
         .module.is-flashing {
-          border-width: 2px;
-          border-style: solid;
-          border-color: var(--highlight-border-color);
-          animation: flash-opacity 0.2s linear 2; /* Fast flash, 2 times = 0.4s */
+            border-width: 2px;
+            border-style: solid;
+            border-color: var(--highlight-border-color);
+            animation: flash-opacity 0.2s linear 2; /* Fast flash, 2 times = 0.4s */
         }
 
         .module.is-highlighted {
-          border-width: 2px;
-          border-style: solid;
-          border-color: var(--highlight-border-color);
+            border-width: 2px;
+            border-style: solid;
+            border-color: var(--highlight-border-color);
         }
 
 
@@ -313,31 +329,48 @@
             left: 0;
             width: 100%;
             height: 2px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, var(--accent-color) 50%, rgba(0,0,0,0) 100%);
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, var(--accent-color) 50%, rgba(0, 0, 0, 0) 100%);
             opacity: 0.3;
             animation: scanline-anim 8s linear infinite;
             z-index: -1;
             transition: background-color 0.3s;
         }
 
-         @keyframes scanline-anim {
-            0% { transform: translateY(0vh); }
-            100% { transform: translateY(100vh); }
+        @keyframes scanline-anim {
+            0% {
+                transform: translateY(0vh);
+            }
+
+            100% {
+                transform: translateY(100vh);
+            }
         }
 
         #commandHelp {
-             margin-top: 20px;
-             padding: 10px;
-             background-color: var(--input-bg-color);
-             border: 1px dashed var(--module-border-color);
-             font-size: 0.9em;
-             transition: background-color 0.3s, border-color 0.3s;
-         }
+            margin-top: 20px;
+            padding: 10px;
+            background-color: var(--input-bg-color);
+            border: 1px dashed var(--module-border-color);
+            font-size: 0.9em;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
 
-        #runAllButton { background-color: #aa0000; }
-        #runAllButton:hover { background-color: #cc0000; }
-        #cycleThemeButton { background-color: #500050; }
-        #cycleThemeButton:hover { color: #fff; background-color: #700070; }
+        #runAllButton {
+            background-color: #aa0000;
+        }
+
+        #runAllButton:hover {
+            background-color: #cc0000;
+        }
+
+        #cycleThemeButton {
+            background-color: #500050;
+        }
+
+        #cycleThemeButton:hover {
+            color: #fff;
+            background-color: #700070;
+        }
 
         .glitch {
             position: relative;
@@ -347,21 +380,116 @@
         }
 
         @keyframes glitch-anim {
-            0% { transform: translate(0); } 2%, 64% { transform: translate(-5px, 0); } 4%, 60% { transform: translate(5px, 0); }
-            62% { transform: translate(-10px, 0); } 66% { transform: translate(10px, 0); } 68% { transform: translate(0); } 100% { transform: translate(0); }
+            0% {
+                transform: translate(0);
+            }
+
+            2%,
+            64% {
+                transform: translate(-5px, 0);
+            }
+
+            4%,
+            60% {
+                transform: translate(5px, 0);
+            }
+
+            62% {
+                transform: translate(-10px, 0);
+            }
+
+            66% {
+                transform: translate(10px, 0);
+            }
+
+            68% {
+                transform: translate(0);
+            }
+
+            100% {
+                transform: translate(0);
+            }
         }
-        .glitch::before, .glitch::after {
-            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%); animation: glitch-anim2 2s infinite reverse;
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+            animation: glitch-anim2 2s infinite reverse;
         }
-        .glitch::after { clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%); animation: glitch-anim3 2s infinite reverse; }
+
+        .glitch::after {
+            clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
+            animation: glitch-anim3 2s infinite reverse;
+        }
+
         @keyframes glitch-anim2 {
-            0% { transform: translate(0); } 2%, 64% { transform: translate(2px, 0); } 4%, 60% { transform: translate(-2px, 0); }
-            62% { transform: translate(5px, 0); } 66% { transform: translate(-5px, 0); } 68% { transform: translate(0); } 100% { transform: translate(0); }
+            0% {
+                transform: translate(0);
+            }
+
+            2%,
+            64% {
+                transform: translate(2px, 0);
+            }
+
+            4%,
+            60% {
+                transform: translate(-2px, 0);
+            }
+
+            62% {
+                transform: translate(5px, 0);
+            }
+
+            66% {
+                transform: translate(-5px, 0);
+            }
+
+            68% {
+                transform: translate(0);
+            }
+
+            100% {
+                transform: translate(0);
+            }
         }
+
         @keyframes glitch-anim3 {
-            0% { transform: translate(0); } 2%, 64% { transform: translate(-1px, 0); } 4%, 60% { transform: translate(1px, 0); }
-            62% { transform: translate(-2px, 0); } 66% { transform: translate(2px, 0); } 68% { transform: translate(0); } 100% { transform: translate(0); }
+            0% {
+                transform: translate(0);
+            }
+
+            2%,
+            64% {
+                transform: translate(-1px, 0);
+            }
+
+            4%,
+            60% {
+                transform: translate(1px, 0);
+            }
+
+            62% {
+                transform: translate(-2px, 0);
+            }
+
+            66% {
+                transform: translate(2px, 0);
+            }
+
+            68% {
+                transform: translate(0);
+            }
+
+            100% {
+                transform: translate(0);
+            }
         }
 
         .theme-red {
@@ -370,43 +498,102 @@
         }
 
         .theme-bluish {
-            --bg-color: #003366; --text-color: #ccffff; --module-bg-color: #002244; --module-border-color: #6699cc;
-            --sidebar-bg-color: #004488; --sidebar-text-color: #bbddff; --accent-color: #88ccff; --input-bg-color: #002a55;
-            --input-text-color: #e0ffff; --command-prompt-color: #e0ffff; --output-bg-color: #001f3d; --system-text-color: #00ffff;
+            --bg-color: #003366;
+            --text-color: #ccffff;
+            --module-bg-color: #002244;
+            --module-border-color: #6699cc;
+            --sidebar-bg-color: #004488;
+            --sidebar-text-color: #bbddff;
+            --accent-color: #88ccff;
+            --input-bg-color: #002a55;
+            --input-text-color: #e0ffff;
+            --command-prompt-color: #e0ffff;
+            --output-bg-color: #001f3d;
+            --system-text-color: #00ffff;
             --highlight-border-color: #ffffff;
-            --delete-icon-filter: invert(80%) sepia(100%) saturate(1000%) hue-rotate(180deg) brightness(1.5); /* Cyan-ish tint */
+            --delete-icon-filter: invert(80%) sepia(100%) saturate(1000%) hue-rotate(180deg) brightness(1.5);
+            /* Cyan-ish tint */
         }
 
         .theme-greenish {
-            --bg-color: #006400; --text-color: #ccffcc; --module-bg-color: #004600; --module-border-color: #66cc66;
-            --sidebar-bg-color: #008000; --sidebar-text-color: #bbffbb; --accent-color: #88ff88; --input-bg-color: #005000;
-            --input-text-color: #eeffee; --command-prompt-color: #eeffee; --output-bg-color: #003c00; --system-text-color: #00ffff;
+            --bg-color: #006400;
+            --text-color: #ccffcc;
+            --module-bg-color: #004600;
+            --module-border-color: #66cc66;
+            --sidebar-bg-color: #008000;
+            --sidebar-text-color: #bbffbb;
+            --accent-color: #88ff88;
+            --input-bg-color: #005000;
+            --input-text-color: #eeffee;
+            --command-prompt-color: #eeffee;
+            --output-bg-color: #003c00;
+            --system-text-color: #00ffff;
             --highlight-border-color: #ffffff;
-            --delete-icon-filter: invert(85%) sepia(50%) saturate(1000%) hue-rotate(80deg) brightness(1.2); /* Green tint */
+            --delete-icon-filter: invert(85%) sepia(50%) saturate(1000%) hue-rotate(80deg) brightness(1.2);
+            /* Green tint */
         }
 
-        .theme-whity, .theme-whity-white, .theme-whity-teal {
-            --bg-color: #f0f0f0; --text-color: #333333; --module-bg-color: #e0e0e0; --module-border-color: #999999;
-            --sidebar-bg-color: #cccccc; --sidebar-text-color: #444444; --accent-color: #666666; --input-bg-color: #d0d0d0;
-            --input-text-color: #222222; --command-prompt-color: #222222; --system-text-color: #ff6600;
+        .theme-whity,
+        .theme-whity-white,
+        .theme-whity-teal {
+            --bg-color: #f0f0f0;
+            --text-color: #333333;
+            --module-bg-color: #e0e0e0;
+            --module-border-color: #999999;
+            --sidebar-bg-color: #cccccc;
+            --sidebar-text-color: #444444;
+            --accent-color: #666666;
+            --input-bg-color: #d0d0d0;
+            --input-text-color: #222222;
+            --command-prompt-color: #222222;
+            --system-text-color: #ff6600;
             --highlight-border-color: #333333;
-            --delete-icon-filter: invert(20%); /* Dark grey */
+            --delete-icon-filter: invert(20%);
+            /* Dark grey */
         }
-        .theme-whity { --output-bg-color: #ffcc00; }
-        .theme-whity-white { --output-bg-color: #ffffff; }
-        .theme-whity-teal { --output-bg-color: #e0f2f7; }
+
+        .theme-whity {
+            --output-bg-color: #ffcc00;
+        }
+
+        .theme-whity-white {
+            --output-bg-color: #ffffff;
+        }
+
+        .theme-whity-teal {
+            --output-bg-color: #e0f2f7;
+        }
 
         .theme-darkmode {
-            --bg-color: #121212; --text-color: #f5f5f5; --module-bg-color: #202020; --module-border-color: #505050;
-            --sidebar-bg-color: #1e1e1e; --sidebar-text-color: #e0e0e0; --accent-color: #a0a0a0; --input-bg-color: #2a2a2a;
-            --input-text-color: #ffffff; --command-prompt-color: #ffffff; --output-bg-color: #252525; --system-text-color: #ffff00;
+            --bg-color: #121212;
+            --text-color: #f5f5f5;
+            --module-bg-color: #202020;
+            --module-border-color: #505050;
+            --sidebar-bg-color: #1e1e1e;
+            --sidebar-text-color: #e0e0e0;
+            --accent-color: #a0a0a0;
+            --input-bg-color: #2a2a2a;
+            --input-text-color: #ffffff;
+            --command-prompt-color: #ffffff;
+            --output-bg-color: #252525;
+            --system-text-color: #ffff00;
             --highlight-border-color: #f0f0f0;
-            --delete-icon-filter: invert(75%); /* Light grey */
+            --delete-icon-filter: invert(75%);
+            /* Light grey */
         }
 
-        .output-area a { color: var(--accent-color); text-decoration: underline; }
-        .output-area a:hover { color: var(--input-text-color); }
-        .main-heading { display: inline; }
+        .output-area a {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        .output-area a:hover {
+            color: var(--input-text-color);
+        }
+
+        .main-heading {
+            display: inline;
+        }
     </style>
 </head>
 
@@ -421,7 +608,14 @@
         <div class="module" id="help-module">
             <p class="command-prompt">COMMAND: HELP</p>
             <div class="output-area">
-                 <p class="output-line data">Available commands: profile (p), experience (exp), projects (proj), contact (c), cv, theme [red|bluish|greenish|whity|darkmode], run all</p>
+                <p class="output-line data">Available commands:</p>
+                <p class="output-line data">- profile (p)</p>
+                <p class="output-line data">- experience (exp)</p>
+                <p class="output-line data">- projects (proj)</p>
+                <p class="output-line data">- contact (c)</p>
+                <p class="output-line data">- cv</p>
+                <p class="output-line data">- theme [red|bluish|greenish|whity|darkmode]</p>
+                <p class="output-line data">- run all</p>
             </div>
         </div>
 
@@ -438,31 +632,36 @@
         </div>
 
         <div id="profile-output-module" class="module" style="display: none;">
-            <button class="delete-btn" onclick="deleteModule(this)" title="Hide this module"><img src="trash.svg" alt="Delete"></button>
+            <button class="delete-btn" onclick="deleteModule(this)" title="Hide this module"><img src="trash.svg"
+                    alt="Delete"></button>
             <p class="command-prompt">OUTPUT: PROFILE</p>
             <div id="profile-output" class="output-area"></div>
         </div>
 
         <div id="experience-output-module" class="module" style="display: none;">
-            <button class="delete-btn" onclick="deleteModule(this)" title="Hide this module"><img src="trash.svg" alt="Delete"></button>
+            <button class="delete-btn" onclick="deleteModule(this)" title="Hide this module"><img src="trash.svg"
+                    alt="Delete"></button>
             <p class="command-prompt">OUTPUT: EXPERIENCE</p>
             <div id="experience-output" class="output-area"></div>
         </div>
 
         <div id="projects-output-module" class="module" style="display: none;">
-            <button class="delete-btn" onclick="deleteModule(this)" title="Hide this module"><img src="trash.svg" alt="Delete"></button>
+            <button class="delete-btn" onclick="deleteModule(this)" title="Hide this module"><img src="trash.svg"
+                    alt="Delete"></button>
             <p class="command-prompt">OUTPUT: SKILLS</p>
             <div id="projects-output" class="output-area"></div>
         </div>
 
         <div id="contact-output-module" class="module" style="display: none;">
-            <button class="delete-btn" onclick="deleteModule(this)" title="Hide this module"><img src="trash.svg" alt="Delete"></button>
+            <button class="delete-btn" onclick="deleteModule(this)" title="Hide this module"><img src="trash.svg"
+                    alt="Delete"></button>
             <p class="command-prompt">OUTPUT: CONTACT</p>
             <div id="contact-output" class="output-area"></div>
         </div>
 
         <div id="cv-output-module" class="module" style="display: none;">
-            <button class="delete-btn" onclick="deleteModule(this)" title="Hide this module"><img src="trash.svg" alt="Delete"></button>
+            <button class="delete-btn" onclick="deleteModule(this)" title="Hide this module"><img src="trash.svg"
+                    alt="Delete"></button>
             <p class="command-prompt">OUTPUT: CV</p>
             <div id="cv-output" class="output-area"></div>
         </div>
@@ -470,10 +669,18 @@
     <div class="sidebar">
         <h2>NAVIGATION</h2>
         <ul>
-            <li><a href="#profile-output-module" onclick="event.preventDefault(); runCommand('profile'); document.getElementById('profile-output-module')?.scrollIntoView({ behavior: 'smooth' });">PROFILE</a></li>
-            <li><a href="#experience-output-module" onclick="event.preventDefault(); runCommand('experience'); document.getElementById('experience-output-module')?.scrollIntoView({ behavior: 'smooth' });">EXPERIENCE</a></li>
-            <li><a href="#projects-output-module" onclick="event.preventDefault(); runCommand('projects'); document.getElementById('projects-output-module')?.scrollIntoView({ behavior: 'smooth' });">SKILLS</a></li>
-            <li><a href="#contact-output-module" onclick="event.preventDefault(); runCommand('contact'); document.getElementById('contact-output-module')?.scrollIntoView({ behavior: 'smooth' });">CONTACT</a></li>
+            <li><a href="#profile-output-module"
+                    onclick="event.preventDefault(); runCommand('profile'); document.getElementById('profile-output-module')?.scrollIntoView({ behavior: 'smooth' });">PROFILE</a>
+            </li>
+            <li><a href="#experience-output-module"
+                    onclick="event.preventDefault(); runCommand('experience'); document.getElementById('experience-output-module')?.scrollIntoView({ behavior: 'smooth' });">EXPERIENCE</a>
+            </li>
+            <li><a href="#projects-output-module"
+                    onclick="event.preventDefault(); runCommand('projects'); document.getElementById('projects-output-module')?.scrollIntoView({ behavior: 'smooth' });">SKILLS</a>
+            </li>
+            <li><a href="#contact-output-module"
+                    onclick="event.preventDefault(); runCommand('contact'); document.getElementById('contact-output-module')?.scrollIntoView({ behavior: 'smooth' });">CONTACT</a>
+            </li>
             <li><a href="#" onclick="event.preventDefault(); runCommand('cv');">DOWNLOAD CV</a></li>
             <li><a href="#" onclick="event.preventDefault(); runCommand('help');">HELP</a></li>
             <li><a href="#" onclick="event.preventDefault(); runCommand('run all');">RUN ALL</a></li>
@@ -518,29 +725,29 @@
             ["system", "[SYSTEM] Loading profile..."],
             ["data", "&gt; Stephen is a Senior Software Engineer:"],
             ["data", "&gt; Expertise includes..."],
-            ["data", "  - Node.js, react, Nest, python."],
-            ["data", "  - Experienced with microservices architecture."],
-            ["data", "  - Proficient in cloud technologies."],
+            ["data", "  - Node.js, react, Nest, python."],
+            ["data", "  - Experienced with microservices architecture."],
+            ["data", "  - Proficient in cloud technologies."],
             ["system", "[SYSTEM] Profile loaded."]
         ];
 
         const experienceData = [
             ["system", "[RUNNING] Fetching experience details..."],
             ["data", "&gt; At MNOCK Ltd (Part-Time), focused on payment workflows, M-Pesa API integration, and AWS deployments with CI/CD."],
-            ["data", "  - Technologies used: Node.js, AWS, M-Pesa API, CI/CD."],
+            ["data", "  - Technologies used: Node.js, AWS, M-Pesa API, CI/CD."],
             ["data", "&gt; At Valice Ltd, worked on microservices, real-time data processing, and database optimization."],
-            ["data", "  - Technologies used: Microservices, Real-time Data, SQL, NoSQL."],
+            ["data", "  - Technologies used: Microservices, Real-time Data, SQL, NoSQL."],
             ["system", "[SYSTEM] Experience details loaded."]
         ];
 
         const projectsData = [
             ["system", "[SYSTEM] Querying skills matrix..."],
             ["data", "&gt; Strong in Fintech Integrations, ensuring secure and resilient transactions."],
-            ["data", "  - Details: Skilled in secure transaction processing and API integrations."],
+            ["data", "  - Details: Skilled in secure transaction processing and API integrations."],
             ["data", "&gt; Knowledgeable in Security Protocols, including OWASP and SSL/TLS implementation."],
-            ["data", "  - Details: Experienced in security hardening and encryption protocols."],
+            ["data", "  - Details: Experienced in security hardening and encryption protocols."],
             ["data", "&gt; Proficient in High-Availability deployments using container orchestration on AWS."],
-            ["data", "  - Details: Familiar with Docker, Kubernetes/ECS, and various AWS services."],
+            ["data", "  - Details: Familiar with Docker, Kubernetes/ECS, and various AWS services."],
             ["system", "[SYSTEM] Skills matrix retrieved."]
         ];
 
@@ -577,36 +784,36 @@
                     mod.classList.remove('is-flashing', 'is-highlighted');
                 }
             });
-             if (helpModule) helpModule.classList.remove('is-flashing', 'is-highlighted');
-             if (commandInputModule) commandInputModule.classList.remove('is-flashing', 'is-highlighted');
+            if (helpModule) helpModule.classList.remove('is-flashing', 'is-highlighted');
+            if (commandInputModule) commandInputModule.classList.remove('is-flashing', 'is-highlighted');
         }
 
         function highlightModule(moduleElement) {
             if (!moduleElement || !highlightableModules.includes(moduleElement)) {
-                 return;
+                return;
             }
             clearAllHighlights();
             moduleElement.classList.add('is-flashing');
             setTimeout(() => {
-                 if (moduleElement && moduleElement.classList.contains('is-flashing')) {
+                if (moduleElement && moduleElement.classList.contains('is-flashing')) {
                     moduleElement.classList.remove('is-flashing');
                     moduleElement.classList.add('is-highlighted');
-                 }
+                }
             }, 400);
         }
 
         function simulateLoading(outputElement, message, data, module, delay = 200) {
-             if (!module || !outputElement) {
+            if (!module || !outputElement) {
                 console.error("Missing module or output element for:", message);
                 return;
             }
             module.style.display = 'block';
             outputElement.innerHTML = `<p class="output-line system">[...] ${message}</p>`;
             setTimeout(() => {
-                 if (outputElement) {
+                if (outputElement) {
                     renderOutputData(data, outputElement);
                     highlightModule(module);
-                 }
+                }
             }, delay);
         }
 
@@ -699,7 +906,15 @@
                     clearCmdOutput();
                     break;
                 case 'help':
-                    commandOutput.innerHTML = `<p class="output-line data">Available commands: profile (p), experience (exp), skills (s), contact (c), cv, theme [red|bluish|greenish|whity|whity-white|whity-teal|darkmode], run all. Or use Cycle Theme button.</p>`;
+                    commandOutput.innerHTML = `<p class="output-line data">Available commands:</p>
+                                               <p class="output-line data">- profile (p)</p>
+                                               <p class="output-line data">- experience (exp)</p>
+                                               <p class="output-line data">- skills (s)</p>
+                                               <p class="output-line data">- contact (c)</p>
+                                               <p class="output-line data">- cv</p>
+                                               <p class="output-line data">- theme [red|bluish|greenish|whity|whity-white|whity-teal|darkmode]</p>
+                                               <p class="output-line data">- run all</p>
+                                               <p class="output-line data">- cycle theme</p>`;
                     break;
                 case 'run all':
                     clearAllHighlights();
@@ -716,21 +931,26 @@
                 case 'theme':
                     commandOutput.innerHTML = `<p class="output-line data">> Available themes: ${themes.join(', ')}. Use command: theme [theme_name]</p>`;
                     break;
-                 case 'cycle theme':
+                case 'cycle theme':
                     cycleTheme();
                     break;
                 default:
                     commandOutput.innerHTML = `<p class="output-line error">> ERROR: Command '${escapedCommand}' not recognized. Type 'help' for available commands.</p>`;
             }
 
-            if (nonContentCommands.includes(command) || commandOutput.querySelector('.error')) {
-                 if (command !== 'run all') { // Don't clear run all message immediately
-                    setTimeout(() => {
-                       if (commandOutput.textContent.length > 0 && !commandOutput.textContent.includes('Running command:')) {
-                            commandOutput.innerHTML = '';
-                       }
-                    }, 3000);
-                }
+            // Remove the setTimeout for clearing commandOutput for 'help' command
+            if (nonContentCommands.includes(command) && command !== 'help' && !commandOutput.querySelector('.error')) {
+                setTimeout(() => {
+                    if (commandOutput.textContent.length > 0 && !commandOutput.textContent.includes('Running command:')) {
+                        commandOutput.innerHTML = '';
+                    }
+                }, 3000);
+            } else if (commandOutput.querySelector('.error')) {
+                setTimeout(() => {
+                    if (commandOutput.textContent.length > 0 && !commandOutput.textContent.includes('Running command:')) {
+                        commandOutput.innerHTML = '';
+                    }
+                }, 3000);
             }
         }
 
@@ -785,32 +1005,32 @@
             const newHTML = words.map(part => {
                 if (part.match(/^\s+$/)) return part;
                 if (part.length > 0) {
-                     const escapedPart = part.replace(/"/g, '&quot;');
-                     return `<h1 class="glitch" data-text="${escapedPart}">${part}</h1>`;
+                    const escapedPart = part.replace(/"/g, '&quot;');
+                    return `<h1 class="glitch" data-text="${escapedPart}">${part}</h1>`;
                 }
                 return '';
             }).join('');
             element.innerHTML = newHTML;
         }
 
-        commandInput.addEventListener('keypress', function(event) {
+        commandInput.addEventListener('keypress', function (event) {
             if (event.key === 'Enter') {
-                 event.preventDefault();
+                event.preventDefault();
                 runCommand();
             }
         });
 
-         window.addEventListener('load', () => {
+        window.addEventListener('load', () => {
             wrapWordsInGlitchSpans('#main-heading');
-            if(commandInput) {
-                 commandInput.focus();
+            if (commandInput) {
+                commandInput.focus();
             }
             // Add IDs to help/input modules dynamically if needed, but they exist in HTML now
             const helpMod = document.querySelector('.main-content .module:nth-child(2)'); // Fragile selector
             if (helpMod && !helpMod.id) helpMod.id = 'help-module';
             const inputMod = document.querySelector('.main-content .module:nth-child(3)'); // Fragile selector
             if (inputMod && !inputMod.id) inputMod.id = 'command-input-module';
-         });
+        });
 
     </script>
 </body>
