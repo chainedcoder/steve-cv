@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STEPHEN NYAMWEYA CV SYSTEM</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #800000;
+            --text-color: #ffdd00;
+            --module-bg-color: #600000;
+            --module-border-color: #cc0000;
+            --sidebar-bg-color: #a00000;
+            --sidebar-text-color: #ffaa00;
+            --accent-color: #ffcc00;
+            --input-bg-color: #500000;
+            --input-text-color: #ffff00;
+            --command-prompt-color: #ffff00;
+            --output-bg-color: transparent;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px; 
+            line-height: 1.4;
+            font-size: 1.1em; 
+            overflow-y: scroll;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column; 
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            min-width: 280px;
+        }
+
+        .sidebar {
+            width: 100%;
+            background-color: var(--sidebar-bg-color);
+            color: var(--sidebar-text-color);
+            padding: 15px;
+            border-left: none;
+            border-bottom: 1px dashed var(--sidebar-text-color);
+            margin-bottom: 20px;
+            position: static;
+            height: auto;
+            overflow-y: auto; 
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s, width 0.3s, padding 0.3s;
+            flex-shrink: 0;
+        }
+
+        /* Tablet and Desktop Styles */
+        @media (min-width: 768px) {
+            body {
+                flex-direction: row; 
+            }
+
+            .main-content {
+                padding-right: 30px; 
+            }
+
+            .sidebar {
+                width: 250px; 
+                border-left: 1px dashed var(--sidebar-text-color);
+                border-bottom: none;
+                position: sticky; 
+                top: 20px;
+                height: calc(100vh - 40px); 
+                margin-bottom: 0;
+                padding: 20px; 
+            }
+        }
+
+        .sidebar h2 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.2em; 
+            margin-top: 0;
+            border-bottom: 1px dashed var(--sidebar-text-color);
+            padding-bottom: 10px;
+            transition: border-color 0.3s;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a {
+            color: var(--accent-color);
+            text-decoration: none;
+            display: block;
+            padding: 5px 0;
+            transition: color 0.3s ease;
+            word-break: break-word;
+        }
+
+        .sidebar a:hover {
+            color: #ffff00; 
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 2.0em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px var(--module-border-color);
+            transition: text-shadow 0.3s;
+            
+        }
+
+        @media (max-width: 480px) { h1 { font-size: 1.5rem; } }
+
+
+        .module {
+            background-color: var(--module-bg-color);
+            padding: 15px;
+            border: 1px dashed var(--module-border-color);
+            margin-bottom: 20px;
+            position: relative;
+            transition: background-color 0.3s, border-color 0.3s;
+            width: 100%;
+        }
+
+        .command-prompt {
+            font-family: 'VT323', monospace;
+            color: var(--command-prompt-color);
+            margin-bottom: 10px;
+            word-break: break-word;
+            transition: color 0.3s;
+        }
+
+        .output-area {
+            font-family: 'VT323', monospace;
+            margin-top: 10px;
+            font-size: 0.9em; 
+            background-color: var(--output-bg-color);
+            padding: 10px;
+            border: 1px solid var(--module-border-color);
+            overflow-x: auto;
+            overflow-y: hidden;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+            color: var(--text-color);
+            min-height: 3em;
+        }
+
+        .output-line {
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 0 0 0.5em 0;
+        }
+         .output-line:last-child {
+            margin-bottom: 0;
+        }
+
+
+        .output-line.system {
+            color: var(--system-text-color);
+        }
+
+        .output-line.data {
+            /* Inherits text color */
+        }
+
+        .error {
+            color: #ff6600;
+        }
+
+        .input-area {
+            background-color: var(--input-bg-color);
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid var(--module-border-color);
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap; 
+            gap: 10px; 
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .input-area span {
+            color: #00ffff;
+            flex-shrink: 0;
+        }
+
+        #commandInput {
+            flex-grow: 1;
+            flex-shrink: 1;
+            min-width: 150px;
+            background: transparent;
+            border: none;
+            color: var(--input-text-color);
+            font-family: 'VT323', monospace;
+            font-size: 1em;
+            outline: none;
+            transition: color 0.3s;
+            line-height: 1.4;
+            padding: 5px;
+        }
+
+        button {
+            background-color: #700000;
+            /* color: var(--input-text-color); */
+            color: #fff;
+            border: 1px solid var(--module-border-color);
+            padding: 8px 15px;
+            font-family: 'VT323', monospace;
+            font-size: 1em; /* Set explicitly for consistency */
+            cursor: pointer;
+            outline: none;
+            flex-shrink: 0;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #900000;
+        }
+
+        /* Module display controlled by JS */
+        #profile-output-module,
+        #experience-output-module,
+        #projects-output-module,
+        #contact-output-module,
+        #cv-output-module {
+            display: none;
+        }
+
+        .pixelated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAAAAACAI8LOAAAAEElEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
+            background-repeat: repeat;
+            z-index: -2;
+            opacity: 0.5;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, var(--accent-color) 50%, rgba(0,0,0,0) 100%);
+            opacity: 0.3;
+            animation: scanline-anim 8s linear infinite;
+            z-index: -1;
+            transition: background-color 0.3s;
+        }
+
+         @keyframes scanline-anim {
+            0% {
+                 transform: translateY(0vh);
+            }
+             100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        #commandHelp {
+             margin-top: 20px;
+             padding: 10px;
+             background-color: var(--input-bg-color);
+             border: 1px dashed var(--module-border-color);
+             font-size: 0.9em;
+             transition: background-color 0.3s, border-color 0.3s;
+         }
+
+        #runAllButton {
+            background-color: #aa0000;
+        }
+         #runAllButton:hover {
+             background-color: #cc0000; 
+        }
+
+        #cycleThemeButton {
+            background-color: #500050; 
+        }
+         #cycleThemeButton:hover {
+            color: #fff;
+            background-color: #700070; 
+        }
+
+
+        .glitch {
+            position: relative;
+            overflow: hidden; 
+            animation: glitch-anim 2s infinite;
+            display: inline-block;
+        }
+
+        @keyframes glitch-anim {
+            0% { transform: translate(0); }
+            2%, 64% { transform: translate(-5px, 0); }
+            4%, 60% { transform: translate(5px, 0); }
+            62% { transform: translate(-10px, 0); }
+            66% { transform: translate(10px, 0); }
+            68% { transform: translate(0); }
+            100% { transform: translate(0); }
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+            animation: glitch-anim2 2s infinite reverse;
+        }
+
+        .glitch::after {
+            clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
+            animation: glitch-anim3 2s infinite reverse;
+        }
+
+        @keyframes glitch-anim2 {
+             0% { transform: translate(0); }
+             2%, 64% { transform: translate(2px, 0); }
+             4%, 60% { transform: translate(-2px, 0); }
+             62% { transform: translate(5px, 0); }
+             66% { transform: translate(-5px, 0); }
+             68% { transform: translate(0); }
+             100% { transform: translate(0); }
+        }
+
+        @keyframes glitch-anim3 {
+            0% { transform: translate(0); }
+            2%, 64% { transform: translate(-1px, 0); }
+            4%, 60% { transform: translate(1px, 0); }
+            62% { transform: translate(-2px, 0); }
+            66% { transform: translate(2px, 0); }
+            68% { transform: translate(0); }
+            100% { transform: translate(0); }
+        }
+        .theme-red { /* Default variables are already red theme */ }
+
+        .theme-bluish {
+            --bg-color: #003366;
+            --text-color: #ccffff;
+            --module-bg-color: #002244;
+            --module-border-color: #6699cc;
+            --sidebar-bg-color: #004488;
+            --sidebar-text-color: #bbddff;
+            --accent-color: #88ccff;
+            --input-bg-color: #002a55;
+            --input-text-color: #e0ffff;
+            --command-prompt-color: #e0ffff;
+            --output-bg-color: #001f3d;
+        }
+
+        .theme-greenish {
+            --bg-color: #006400;
+            --text-color: #ccffcc;
+            --module-bg-color: #004600;
+            --module-border-color: #66cc66;
+            --sidebar-bg-color: #008000;
+            --sidebar-text-color: #bbffbb;
+            --accent-color: #88ff88;
+            --input-bg-color: #005000;
+            --input-text-color: #eeffee;
+            --command-prompt-color: #eeffee;
+            --output-bg-color: #003c00;
+            --system-text-color: #00ffff;
+        }
+
+        .theme-whity, .theme-whity-white, .theme-whity-teal {
+            --bg-color: #f0f0f0;
+            --text-color: #333333;
+            --module-bg-color: #e0e0e0;
+            --module-border-color: #999999;
+            --sidebar-bg-color: #cccccc;
+            --sidebar-text-color: #444444;
+            --accent-color: #666666;
+            --input-bg-color: #d0d0d0;
+            --input-text-color: #222222;
+            --command-prompt-color: #222222;
+            --system-text-color: #ff6600;
+        }
+        .theme-whity { --output-bg-color: #ffcc00; }
+        .theme-whity-white { --output-bg-color: #ffffff; }
+        .theme-whity-teal { --output-bg-color: #e0f2f7; }
+
+
+        .theme-darkmode {
+            --bg-color: #121212;
+            --text-color: #f5f5f5;
+            --module-bg-color: #202020;
+            --module-border-color: #505050;
+            --sidebar-bg-color: #1e1e1e;
+            --sidebar-text-color: #e0e0e0;
+            --accent-color: #a0a0a0;
+            --input-bg-color: #2a2a2a;
+            --input-text-color: #ffffff;
+            --command-prompt-color: #ffffff;
+            --output-bg-color: #252525;
+        }
+
+        .output-area a {
+             color: var(--accent-color);
+             text-decoration: underline;
+        }
+         .output-area a:hover {
+             color: var(--input-text-color);
+         }
+
+         .main-heading {
+            display: inline;
+         }
+
+    </style>
+</head>
+
+<body class="theme-red">
+    <div class="pixelated-bg"></div>
+    <div class="scanline"></div>
+    <div class="main-content">
+        <header >
+            <span id="main-heading">> STEPHEN NYAMWEYA O :: CV v0.4</span>
+            <!-- <span id="main-heading2">CV v2.3</span> -->
+        </header>
+
+        <div class="module">
+            <p class="command-prompt">COMMAND: HELP</p>
+            <div class="output-area">
+                 <p class="output-line data">Available commands: profile (p), experience (exp), projects (proj), contact (c), cv, theme [red|bluish|greenish|whity|darkmode], run all</p>
+            </div>
+        </div>
+
+        <div class="module">
+            <p class="command-prompt">> ENTER COMMAND</p>
+            <div class="input-area">
+                <span>></span>
+                <input type="text" id="commandInput" placeholder="" autofocus>
+                <button onclick="runCommand()">RUN</button>
+                <button id="runAllButton" onclick="runAllCommands()">RUN ALL</button>
+                <button id="cycleThemeButton" onclick="cycleTheme()" title="Cycle Theme">CYCLE THEME</button>
+            </div>
+            <div id="commandOutput" class="output-area"></div>
+        </div>
+
+        <div id="profile-output-module" class="module" style="display: none;">
+            <p class="command-prompt">OUTPUT: PROFILE</p>
+            <div id="profile-output" class="output-area"></div>
+        </div>
+
+        <div id="experience-output-module" class="module" style="display: none;">
+            <p class="command-prompt">OUTPUT: EXPERIENCE</p>
+            <div id="experience-output" class="output-area"></div>
+        </div>
+
+        <div id="projects-output-module" class="module" style="display: none;">
+            <p class="command-prompt">OUTPUT: SKILLS</p>
+            <div id="projects-output" class="output-area"></div>
+        </div>
+
+        <div id="contact-output-module" class="module" style="display: none;">
+            <p class="command-prompt">OUTPUT: CONTACT</p>
+            <div id="contact-output" class="output-area"></div>
+        </div>
+
+        <div id="cv-output-module" class="module" style="display: none;">
+            <p class="command-prompt">OUTPUT: CV</p>
+            <div id="cv-output" class="output-area"></div>
+        </div>
+    </div><div class="sidebar">
+        <h2>NAVIGATION</h2>
+        <ul>
+            <li><a href="#profile-output-module" onclick="event.preventDefault(); runCommand('profile'); document.getElementById('profile-output-module')?.scrollIntoView({ behavior: 'smooth' });">PROFILE</a></li>
+            <li><a href="#experience-output-module" onclick="event.preventDefault(); runCommand('experience'); document.getElementById('experience-output-module')?.scrollIntoView({ behavior: 'smooth' });">EXPERIENCE</a></li>
+            <li><a href="#projects-output-module" onclick="event.preventDefault(); runCommand('projects'); document.getElementById('projects-output-module')?.scrollIntoView({ behavior: 'smooth' });">SKILLS</a></li>
+            <li><a href="#contact-output-module" onclick="event.preventDefault(); runCommand('contact'); document.getElementById('contact-output-module')?.scrollIntoView({ behavior: 'smooth' });">CONTACT</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('cv');">DOWNLOAD CV</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('help');">HELP</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('run all');">RUN ALL</a></li>
+            <li style="margin-top: 20px; border-top: 1px dashed var(--sidebar-text-color); padding-top: 10px;">
+                THEME
+            </li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('theme red')">RED</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('theme bluish')">BLUISH</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('theme greenish')">GREENISH</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('theme whity')">WHITY (Default)</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('theme whity-white')">WHITY (White BG)</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('theme whity-teal')">WHITY (Teal BG)</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('theme darkmode')">DARKMODE</a></li>
+            <li><a href="#" onclick="event.preventDefault(); cycleTheme();">CYCLE THEME</a></li>
+
+        </ul>
+    </div><script>
+        const body = document.body;
+        const commandInput = document.getElementById('commandInput');
+        const commandOutput = document.getElementById('commandOutput');
+        const profileOutput = document.getElementById('profile-output');
+        const experienceOutput = document.getElementById('experience-output');
+        const projectsOutput = document.getElementById('projects-output');
+        const contactOutput = document.getElementById('contact-output');
+        const cvOutput = document.getElementById('cv-output');
+
+        const profileOutputModule = document.getElementById('profile-output-module');
+        const experienceOutputModule = document.getElementById('experience-output-module');
+        const projectsOutputModule = document.getElementById('projects-output-module');
+        const contactOutputModule = document.getElementById('contact-output-module');
+        const cvOutputModule = document.getElementById('cv-output-module');
+        const helpOutputArea = document.getElementById('help-output-area'); 
+
+        // --- Data Arrays  ---
+const profileData = [
+    ["system", "[SYSTEM] Loading profile..."],
+    ["data", "&gt; Stephen is a Senior Software Engineer:"],
+    ["data", "&gt; Expertise includes..."],
+    ["data", "  - Node.js, react, Nest, python."],
+    ["data", "  - Experienced with microservices architecture."],
+    ["data", "  - Proficient in cloud technologies."],
+    ["system", "[SYSTEM] Profile loaded."]
+];
+
+const experienceData = [
+    ["system", "[RUNNING] Fetching experience details..."],
+    ["data", "&gt; At MNOCK Ltd (Part-Time), focused on payment workflows, M-Pesa API integration, and AWS deployments with CI/CD."],
+    ["data", "  - Technologies used: Node.js, AWS, M-Pesa API, CI/CD."],
+    ["data", "&gt; At Valice Ltd, worked on microservices, real-time data processing, and database optimization."],
+    ["data", "  - Technologies used: Microservices, Real-time Data, SQL, NoSQL."],
+    ["system", "[SYSTEM] Experience details loaded."]
+];
+
+const projectsData = [
+    ["system", "[SYSTEM] Querying skills matrix..."],
+    ["data", "&gt; Strong in Fintech Integrations, ensuring secure and resilient transactions."],
+    ["data", "  - Details: Skilled in secure transaction processing and API integrations."],
+    ["data", "&gt; Knowledgeable in Security Protocols, including OWASP and SSL/TLS implementation."],
+    ["data", "  - Details: Experienced in security hardening and encryption protocols."],
+    ["data", "&gt; Proficient in High-Availability deployments using container orchestration on AWS."],
+    ["data", "  - Details: Familiar with Docker, Kubernetes/ECS, and various AWS services."],
+    ["system", "[SYSTEM] Skills matrix retrieved."]
+];
+
+const contactData = [
+    ["system", "[SYSTEM] Connecting..."],
+    ["data", "Email: stephen.nyamweya.o@gmail.com"],
+    ["data", `GitHub: <a href="https://github.com/chainedcoder" target="_blank" style="color: var(--accent-color); text-decoration: underline;">Visit GitHub profile</a>`],
+    ["system", "[SYSTEM] Connected."]
+];
+
+const cvLinkData = [
+    ["system", "[SYSTEM] Accessing CV resource..."],
+    ["data", `<a href="full_cv.pdf" target="_blank" style="color: var(--accent-color); text-decoration: underline;">Click here to access CV</a>`],
+    ["system", "[SYSTEM] Resource link generated."]
+];
+
+
+        // --- Helper Functions ---
+        function renderOutputData(data, outputElement) {
+            outputElement.innerHTML = ''; 
+            data.forEach(item => {
+                const type = item[0];
+                const text = item[1];
+                const lineElement = document.createElement('p');
+                lineElement.classList.add('output-line');
+                lineElement.classList.add(type);
+                lineElement.innerHTML = text; 
+                outputElement.appendChild(lineElement);
+            });
+             outputElement.scrollTop = 0;
+        }
+
+        function simulateLoading(outputElement, message, data, module, delay = 200) {
+             if (!module || !outputElement) {
+                console.error("Missing module or output element for:", message);
+                return;
+            }
+            module.style.display = 'block';
+            outputElement.innerHTML = `<p class="output-line system">[...] ${message}</p>`;
+            setTimeout(() => {
+                 if (outputElement) {
+                    renderOutputData(data, outputElement);
+                 }
+            }, delay);
+        }
+
+        const themes = ['red', 'bluish', 'greenish', 'whity', 'whity-white', 'whity-teal', 'darkmode'];
+
+function setTheme(themeName) {
+    if (!themes.includes(themeName)) {
+        console.warn(`Invalid theme name provided: ${themeName}`);
+        return;
+    }
+    body.className = ''; 
+    body.classList.add(`theme-${themeName}`);
+    console.log(`Theme set to: theme-${themeName}`);
+}
+
+function cycleTheme() {
+    let currentTheme = themes[0]; 
+    for (const theme of themes) {
+        if (document.body.classList.contains(`theme-${theme}`)) {
+            currentTheme = theme;
+            break;
+        }
+    }
+    const currentThemeIndex = themes.indexOf(currentTheme);
+
+    // Calculate next index, wrap around
+    const nextThemeIndex = (currentThemeIndex + 1) % themes.length;
+    const nextThemeName = themes[nextThemeIndex];
+
+    // Apply the theme
+    setTheme(nextThemeName);
+
+    const friendlyThemeName = nextThemeName
+        .replace('whity-white', 'Whity (White BG)')
+        .replace('whity-teal', 'Whity (Teal BG)')
+        .replace('whity', 'Whity (Default)')
+        .replace('-', ' '); 
+
+    const capitalizedThemeName = friendlyThemeName.charAt(0).toUpperCase() + friendlyThemeName.slice(1);
+
+
+     commandOutput.innerHTML = `<p class="output-line system">> Theme cycled to ${capitalizedThemeName}.</p>`;
+     // Clear the message after a delay
+     setTimeout(() => {
+         const cycleMessage = `> Theme cycled to ${capitalizedThemeName}.`;
+         if (commandOutput.textContent.includes(cycleMessage)) {
+             commandOutput.innerHTML = '';
+         }
+     }, 2000);
+ }
+
+function runCommand(commandOverride = null) {
+    const command = (commandOverride || commandInput.value).trim().toLowerCase();
+    commandOutput.innerHTML = '';
+
+    const runningMsg = document.createElement('p');
+    runningMsg.classList.add('output-line', 'system');
+    const escapedCommand = command.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    const themeCommands = themes.map(t => `theme ${t}`);
+    if (!commandOverride || !themeCommands.includes(commandOverride.toLowerCase())) {
+         runningMsg.textContent = `> Running command: ${escapedCommand}`;
+         commandOutput.appendChild(runningMsg);
+    }
+
+
+    if (!commandOverride) {
+        commandInput.value = '';
+    }
+
+    const clearCmdOutput = () => setTimeout(() => {
+        if (commandOutput.firstChild === runningMsg || commandOutput.textContent.includes(`Running command: ${escapedCommand}`)) {
+            commandOutput.innerHTML = '';
+        }
+    }, 1500);
+
+    switch (command) {
+        case 'profile': case 'p':
+            simulateLoading(profileOutput, 'LOADING PROFILE...', profileData, profileOutputModule); clearCmdOutput(); break;
+        case 'experience': case 'exp':
+            simulateLoading(experienceOutput, 'LOADING EXPERIENCE...', experienceData, experienceOutputModule); clearCmdOutput(); break;
+        case 'projects': case 'proj':
+            simulateLoading(projectsOutput, 'ACCESSING PROJECTS...', projectsData, projectsOutputModule); clearCmdOutput(); break;
+        case 'contact': case 'c':
+            simulateLoading(contactOutput, 'CONNECTING...', contactData, contactOutputModule); clearCmdOutput(); break;
+        case 'cv': case 'get cv':
+            simulateLoading(cvOutput, 'ACCESSING CV...', cvLinkData, cvOutputModule); clearCmdOutput(); break;
+        case 'help':
+            commandOutput.innerHTML = `<p class="output-line data">Available commands: profile (p), experience (exp), skills (s), contact (c), cv, theme [red|bluish|greenish|whity|whity-white|whity-teal|darkmode], run all. Or use Cycle Theme button.</p>`;
+            break; // Don't clear help message
+        case 'run all':
+            runAllCommands(); break; // runAllCommands handles its own output
+
+        // --- Theme Commands ---
+        case 'theme red': setTheme('red'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Red.</p>'; break;
+        case 'theme bluish': setTheme('bluish'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Bluish.</p>'; break;
+        case 'theme greenish': setTheme('greenish'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Greenish.</p>'; break;
+        case 'theme whity': setTheme('whity'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Whity (Default).</p>'; break;
+        case 'theme whity-white': setTheme('whity-white'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Whity (White BG).</p>'; break;
+        case 'theme whity-teal': setTheme('whity-teal'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Whity (Teal BG).</p>'; break;
+        case 'theme darkmode': setTheme('darkmode'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Darkmode.</p>'; break;
+        case 'theme':
+            commandOutput.innerHTML = `<p class="output-line data">> Available themes: ${themes.join(', ')}. Use command: theme [theme_name]</p>`;
+            break; // Don't clear theme help
+        default:
+            commandOutput.innerHTML = `<p class="output-line error">> ERROR: Command '${escapedCommand}' not recognized. Type 'help' for available commands.</p>`;
+    }
+}
+
+        function runAllCommands() {
+            commandOutput.innerHTML = '<p class="output-line system">> Running all commands...</p>';
+            let delay = 0;
+            const interval = 600;
+
+             if(profileOutputModule) {
+                setTimeout(() => simulateLoading(profileOutput, 'LOADING PROFILE...', profileData, profileOutputModule), delay);
+                delay += interval;
+             }
+             if(experienceOutputModule) {
+                setTimeout(() => simulateLoading(experienceOutput, 'LOADING EXPERIENCE...', experienceData, experienceOutputModule), delay);
+                delay += interval;
+             }
+              if(projectsOutputModule) {
+                setTimeout(() => simulateLoading(projectsOutput, 'ACCESSING PROJECTS...', projectsData, projectsOutputModule), delay);
+                delay += interval;
+             }
+              if(contactOutputModule) {
+                setTimeout(() => simulateLoading(contactOutput, 'CONNECTING...', contactData, contactOutputModule), delay);
+                delay += interval;
+             }
+             if(cvOutputModule) {
+                setTimeout(() => simulateLoading(cvOutput, 'ACCESSING CV...', cvLinkData, cvOutputModule), delay);
+             }
+
+             setTimeout(() => {
+                 if (commandOutput.textContent.includes("Running all commands...")) {
+                    commandOutput.innerHTML = '<p class="output-line system">> All commands executed.</p>';
+                 }
+             }, delay + 500);
+        }
+
+        function setTheme(themeName) {
+            body.className = '';
+            body.classList.add(`theme-${themeName}`);
+            console.log(`Theme set to: theme-${themeName}`);
+        }
+
+        function wrapWordsInGlitchSpans(selector) {
+            const element = document.querySelector(selector);
+
+            
+            if (!element) {
+                console.warn("Element not found for glitch wrapping:", selector);
+                return;
+            }
+
+            const originalText = element.textContent.trim();
+            // Split by space, keeping the space for joining later
+            const words = originalText.split(/(\s+)/); // Split but keep spaces as separate array elements
+            console.log(selector, words)
+            const newHTML = words.map(part => {
+                // Check if the part is just whitespace
+                if (part.match(/^\s+$/)) {
+                    return part; // Keep whitespace as is
+                }
+                // Check if the part is an actual word
+                if (part.length > 0) {
+                     // Escape quotes for the attribute, though unlikely needed for single words
+                     const escapedPart = part.replace(/"/g, '&quot;');
+                     return `<h1 class="glitch" data-text="${escapedPart}">${part}</h1>`;
+                }
+                return ''; // Handle potential empty strings
+            }).join('');
+
+            element.innerHTML = newHTML;
+        }
+
+
+        // --- Event Listeners ---
+        commandInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                 event.preventDefault();
+                runCommand();
+            }
+        });
+
+         window.addEventListener('load', () => {
+            // Apply the glitch wrapping to the H1
+            wrapWordsInGlitchSpans('#main-heading');
+            // wrapWordsInGlitchSpans('#main-heading2');
+
+            // Focus input
+            if(commandInput) {
+                 commandInput.focus();
+            }
+         });
+
+    </script>
+</body>
+
+</html>
