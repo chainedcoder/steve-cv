@@ -492,12 +492,12 @@
             }
         }
 
-        .theme-red {
+        .theme-reddy {
             --highlight-border-color: #ffffff;
             --delete-icon-filter: invert(100%);
         }
 
-        .theme-bluish {
+        .theme-bluey {
             --bg-color: #003366;
             --text-color: #ccffff;
             --module-bg-color: #002244;
@@ -515,7 +515,7 @@
             /* Cyan-ish tint */
         }
 
-        .theme-greenish {
+        .theme-greenie {
             --bg-color: #006400;
             --text-color: #ccffcc;
             --module-bg-color: #004600;
@@ -564,7 +564,7 @@
             --output-bg-color: #e0f2f7;
         }
 
-        .theme-darkmode {
+        .theme-darkie {
             --bg-color: #121212;
             --text-color: #f5f5f5;
             --module-bg-color: #202020;
@@ -597,7 +597,7 @@
     </style>
 </head>
 
-<body class="theme-red">
+<body class="theme-reddy">
     <div class="pixelated-bg"></div>
     <div class="scanline"></div>
     <div class="main-content">
@@ -614,7 +614,7 @@
                 <p class="output-line data">- projects (proj)</p>
                 <p class="output-line data">- contact (c)</p>
                 <p class="output-line data">- cv</p>
-                <p class="output-line data">- theme [red|bluish|greenish|whity|darkmode]</p>
+                <p class="output-line data">- theme [reddy|bluey|greenie|whity|darkie]</p>
                 <p class="output-line data">- run all</p>
             </div>
         </div>
@@ -685,13 +685,13 @@
             <li><a href="#" onclick="event.preventDefault(); runCommand('help');">HELP</a></li>
             <li><a href="#" onclick="event.preventDefault(); runCommand('run all');">RUN ALL</a></li>
             <li style="margin-top: 20px; border-top: 1px dashed var(--sidebar-text-color); padding-top: 10px;">THEME</li>
-            <li><a href="#" onclick="event.preventDefault(); runCommand('theme red')">RED</a></li>
-            <li><a href="#" onclick="event.preventDefault(); runCommand('theme bluish')">BLUISH</a></li>
-            <li><a href="#" onclick="event.preventDefault(); runCommand('theme greenish')">GREENISH</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('theme reddy')">REDDY</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('theme bluey')">BLUEY</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('theme greenie')">GREENIE</a></li>
             <li><a href="#" onclick="event.preventDefault(); runCommand('theme whity')">WHITY (Default)</a></li>
-            <li><a href="#" onclick="event.preventDefault(); runCommand('theme whity-white')">WHITY (White BG)</a></li>
-            <li><a href="#" onclick="event.preventDefault(); runCommand('theme whity-teal')">WHITY (Teal BG)</a></li>
-            <li><a href="#" onclick="event.preventDefault(); runCommand('theme darkmode')">DARKMODE</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('theme whity-white')">WHITY White</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('theme whity-teal')">WHITY Teal</a></li>
+            <li><a href="#" onclick="event.preventDefault(); runCommand('theme darkie')">DARKIE</a></li>
             <li><a href="#" onclick="event.preventDefault(); cycleTheme();">CYCLE THEME</a></li>
         </ul>
     </div>
@@ -817,7 +817,7 @@
             }, delay);
         }
 
-        const themes = ['red', 'bluish', 'greenish', 'whity', 'whity-white', 'whity-teal', 'darkmode'];
+        const themes = ['reddy', 'bluey', 'greenie', 'whity', 'whity-white', 'whity-teal', 'darkie'];
 
         function setTheme(themeName) {
             if (!themes.includes(themeName)) {
@@ -843,8 +843,8 @@
             setTheme(nextThemeName);
 
             const friendlyThemeName = nextThemeName
-                .replace('whity-white', 'Whity (White BG)')
-                .replace('whity-teal', 'Whity (Teal BG)')
+                .replace('whity-white', 'Whity White')
+                .replace('whity-teal', 'Whity Teal')
                 .replace('whity', 'Whity (Default)')
                 .replace('-', ' ');
             const capitalizedThemeName = friendlyThemeName.charAt(0).toUpperCase() + friendlyThemeName.slice(1);
@@ -912,7 +912,7 @@
                                                <p class="output-line data">- skills (s)</p>
                                                <p class="output-line data">- contact (c)</p>
                                                <p class="output-line data">- cv</p>
-                                               <p class="output-line data">- theme [red|bluish|greenish|whity|whity-white|whity-teal|darkmode]</p>
+                                               <p class="output-line data">- theme [reddy|bluey|greenie|whity|whity-white|whity-teal|darkie]</p>
                                                <p class="output-line data">- run all</p>
                                                <p class="output-line data">- cycle theme</p>`;
                     break;
@@ -921,13 +921,13 @@
                     commandOutput.innerHTML = '<p class="output-line system">> Initiating all commands...</p>';
                     runAllCommands();
                     break;
-                case 'theme red': setTheme('red'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Red.</p>'; break;
-                case 'theme bluish': setTheme('bluish'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Bluish.</p>'; break;
-                case 'theme greenish': setTheme('greenish'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Greenish.</p>'; break;
+                case 'theme reddy': setTheme('reddy'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Reddy.</p>'; break;
+                case 'theme bluey': setTheme('bluey'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Bluish.</p>'; break;
+                case 'theme greenie': setTheme('greenie'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Greenish.</p>'; break;
                 case 'theme whity': setTheme('whity'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Whity (Default).</p>'; break;
                 case 'theme whity-white': setTheme('whity-white'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Whity (White BG).</p>'; break;
                 case 'theme whity-teal': setTheme('whity-teal'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Whity (Teal BG).</p>'; break;
-                case 'theme darkmode': setTheme('darkmode'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Darkmode.</p>'; break;
+                case 'theme darkie': setTheme('darkie'); commandOutput.innerHTML = '<p class="output-line system">> Theme set to Darkmode.</p>'; break;
                 case 'theme':
                     commandOutput.innerHTML = `<p class="output-line data">> Available themes: ${themes.join(', ')}. Use command: theme [theme_name]</p>`;
                     break;
